@@ -35,3 +35,4 @@
         - ```h``` A halfword, which is two bytes in size
         - ```w``` A word, which is four bytes in size
         - ```g``` A giant, which is eight bytes in size
+- ```bt``` (Backtrace) will show you a the stack or istory of functions, ```bf ful```will show you variables as well.
