@@ -9,10 +9,10 @@
         - Writable, but fixed in size
     - **Heap:** directly controlled by the programmer, writes downward towards higher memory addresses
     - **Stack:** used to store local function variables and context during function calls (what ```bt``` looks at) grows upards towards lower memory
-- When a function is called a stack frame is pushed to the stack. 
+- When a function is called a stack frame is pushed to the stack [Check out this youtube video](https://www.youtube.com/watch?v=vcfQVwtoyHY&list=PL_9C1QR5FDr2GZVhwajY_uWUPzkzCPMeK). 
     - frame contains function parameters, its local variables and the: 
         - SFP (saved frame pointer), used to restore EIP to previous value
-        - return address, used to restore EIP to the next inst adter the function call
+        - return address, used to restore EIP to the next inst after the function call
 ![Stack](https://learning.oreilly.com/api/v2/epubs/urn:orm:book:9781593271442/files/httpatomoreillycomsourcenostarchimages254229.png.jpg)
     - when going from main to funct
         - parameters are added to the ESP
@@ -22,4 +22,6 @@
         - variables are added on top of funct ebp 
 - ```malloc()``` and ```free()``` are used to allocate and deallocate space in the heap respectively
     - malloc returns a pointer with the datatype void so it must be typecasted to its expected type
+- use ```atoi()``` (ASCII to INT) to change character type to int
+
     

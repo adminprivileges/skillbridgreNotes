@@ -13,9 +13,11 @@
 - You can pad a number with 0s by prepending a format string with a number ex ```03%d```
 - When taking user input the ```scanf``` tool can only take pointers so make sure to use the ```&``` operator ex: ```scanf(%s, &[variable])```
 - You can temporarily change a varable datatype by typecasting ex: ```(float) [variable]```
-- Doing arithmetic on typecasted pointers is a bad idea unless you change it to the expected value first and then back to its typecasted self ex: ```int_pointer = (char *) ((int *) int_pointer + 1)```
-    - void pointers must be typecasted before arithmetic
-    - void pointers cant be de-referenced
+    - Make sure to include an ```*``` after the type if youre typecasting a pointer because youre saying its a pointer to this var ex ```(int*) [pointer_variable]``` [ref](https://ecomputernotes.com/what-is-c/function-a-pointer/type-casting-of-pointers)
+
+    - Doing arithmetic on typecasted pointers is a bad idea unless you change it to the expected value first and then back to its typecasted self ex: ```int_pointer = (char *) ((int *) int_pointer + 1)```
+        - void pointers must be typecasted before arithmetic
+        - void pointers cant be de-referenced
 - static variables preserve their values even when out of scope ex:
 ```
 #include <stdio.h>
