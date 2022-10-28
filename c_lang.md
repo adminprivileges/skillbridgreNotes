@@ -1,5 +1,6 @@
 ## x200
-- When the filename for a #include is surrounded by < and >, the compiler looks for this file in standard include paths, such as /usr/include/. If the filename is surrounded by quotes, the compiler looks in the current directory. 
+- add newlines at the end of your code, its the standards and ```#includes``` can get a bit messy if you dont since the code is prepended to the beginning EXACTLY as it is. 
+- When the filename for a #include is surrounded by < and >, the compiler looks for this file in standard include paths, such as /usr/include/. If the filename is surrounded by quotes, the compiler looks in the current directory.
 - always terminate statements with a ```;```
 - strings are just character arrays, to avoid having to add them one at a time, use strcpy ex ```strcpy([var], "Hello World!");```
 - ```&``` Specifies address of
@@ -10,7 +11,7 @@
     - ```%x``` Hexadecimal
     - ```%s``` String
     - ```%n``` Number of bytes written so far
-    - ```p```  Memory Address
+    - ```%p```  Memory Address
 - You can pad a number with 0s by prepending a format string with a number ex ```03%d```
 - When taking user input the ```scanf``` tool can only take pointers so make sure to use the ```&``` operator ex: ```scanf(%s, &[variable])```
 - You can temporarily change a varable datatype by typecasting ex: ```(float) [variable]```
