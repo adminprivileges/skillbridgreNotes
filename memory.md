@@ -16,7 +16,7 @@
 ![Stack](https://learning.oreilly.com/api/v2/epubs/urn:orm:book:9781593271442/files/httpatomoreillycomsourcenostarchimages254229.png.jpg)
     - when going from main to funct
         - parameters are added to the ESP
-        - Main ebp becomed SFP
+        - Main ebp becomes SFP
         - funct EBP sits between SFP and return address
         - next instruction becomes return address
         - variables are added on top of funct ebp 

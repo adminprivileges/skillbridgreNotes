@@ -21,7 +21,7 @@
     - ```EIP``` (Index Pointer): Holds the offset of the next instruction. It can only be read 
 
 - x86 processor values are stored in little-endian (least sig byte first) byte order which means the byte values ```0xc7    0x45    0xfc    0x00``` would be stored in a word as ```0x00fc45c7```
-- GDB examination syntax ```x/[number(opt, default=1)][format][size(opt, default=word)] [target]``` ex ```x/2xb $eip```
+- GDB examination syntax ```x/[number(opt, default=1)][format][size(opt, default=word)] [target]``` ex: ```x/2xb $eip```
     - format:
         - ```o``` Display in octal.
         - ```x``` Display in hexadecimal.
