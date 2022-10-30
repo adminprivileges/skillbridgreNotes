@@ -3,3 +3,4 @@
     - heap is more flexible with size changes and altering memory
 - In gdb, im getting ```0x41:   Cannot access memory at address 0x41```
   - Check out this explination on [SoF](https://stackoverflow.com/questions/30139356/gdb-cant-access-memory-address-error)
+  - need to understand diff between print a x/x

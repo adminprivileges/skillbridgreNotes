@@ -10,7 +10,7 @@
         ```
 - The ```-g``` flag can be used by gcc to include extra debugging information, which will give GDB access to the source code.
 - Registers
-    - ```EAX``` (Accumulator register): It is used for I/O port access, arithmetic, interrupt calls, etc
+    - ```EAX``` (Accumulator regiSster): It is used for I/O port access, arithmetic, interrupt calls, etc
     - ```EBX``` (Base register): It is used as a base pointer for memory access. Gets some interrupt return values
     - ```ECX``` (Counter register): It is used as a loop counter and for shifts. Gets some interrupt values
     - ```EDX``` (Data register): It is used for I/O port access, arithmetic, some interrupt calls.
