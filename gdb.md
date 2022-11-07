@@ -29,3 +29,6 @@
     -  ```focus [layout]``` - change your cursor focus
        -  ```focus cmd``` - move cursor back to gdb command line
  -  ```CTRL+X+O``` - switch focus
+
+
+Break 1. ESP = 

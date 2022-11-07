@@ -1,0 +1,12 @@
+## Networking
+- There are two kinds of sockets
+  - Stream Sockets: Used for TCP
+  - Datagram Sockets: Used for TCP
+- A socket behaves a lot like a file descriptor, and can be interacted with using ```read()```  and ```write()``` a the prototype of a socket looks like this:
+  - ```socket(int domain, int type, int protocol)```
+    - ```domain``` - protocol family of the socket (ex: ```pf_inet, pf_ax25```)
+    - ```type``` - type of socket (ex: ```sock_stream, sock_dgram```)
+    - ```protocol``` - choose a protocol within the family (most families only have 1 so this is usually set to ```0```)
+  - ```SOCKADDR_COMMON``` is an unsigned int used to represent the family of addresses along with the rest of the strcture for its saved data 
+  - The port number and IP in ```AF_INET``` are expected to be in big endian (regardless of architecture) and there are functions that can be used to convert this such as ```htonl``` (Host to network long)
+  - 
