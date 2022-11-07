@@ -64,3 +64,5 @@ void main(){
     - Via a pointer to the struct (arrow operator): ```[pointer]->[element]```
     - Typecasting the pointer then dereferencing the value out (assuming you know how the data is store in memory): ```*((int *) [pointer])```
     - if you want to grab user input but you also need spaces you can use a scanset char ```[]``` which says "read only" the trick is to combine with a not operator ```^``` to make it act as"read until" ex:  ```scanf("%[^\n]s", [variable])``` this will take all user input until a newline is sent into one string.   
+  - You can use the ```#define``` directive to set global constants
+  - 
