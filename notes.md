@@ -1,10 +1,184 @@
-## x200
-- add newlines at the end of your code, its the standards and ```#includes``` can get a bit messy if you dont since the code is prepended to the beginning EXACTLY as it is. 
-- When the filename for a #include is surrounded by < and >, the compiler looks for this file in standard include paths, such as /usr/include/. If the filename is surrounded by quotes, the compiler looks in the current directory.
-- always terminate statements with a ```;```
-- strings are just character arrays, to avoid having to add them one at a time, use strcpy ex ```strcpy([var], "Hello World!");```
-- ```&``` Specifies address of
-- ```*``` Indicates a pointer
+# Art of Exploitation Notes
+## x200 Programming
+### Key definfitions to know:
+- **Variables** - An object that can hold data
+  - **Constant** - A type of variable that doesn't change
+  - **Variable (Data) types**
+    - **int** - stores whole numbers (2 or 4 bytes)
+    - **float** - stores fractional digits can store up to 7 digits (4 bytes)
+    - **char** - store single character (1 byte)
+- **Pointers** - A variable that storesthe address of another variable as its value here are some key concepts as they apply to pointers
+  - **Dereference/Pointer** (```*```)
+    - When used in a declaration ```int* ptr``` it creates a pointer var
+    - When used anywhere else is used to dereference (reference the value stored at a pointer location) ex: ```*ptr=10```
+  - **Reference** (```&```) - Specifies address of a variable ex ```*ptr=&x```
+
+- **Control Structures** - Control structures are the statements that dictate the flow of execution of your code they include:
+  - [**If, Else**](https://www.w3schools.com/c/c_conditions.php) - These statements dictate a decision that is made based on the result of a certain condition. ex:
+    ```c
+    if(you_understand_this){
+        int gold_star_count = 1
+    } 
+    else(
+        int click_if_else_hyperlink = 1
+    )
+    ```
+    *note: despite what people tell you, use the braces ```{}``` in your if statements even if its only one line*
+  - [**While**](https://www.w3schools.com/c/c_while_loop.php) - Keeps looping a block of code until a condition is reached ex:
+    ```c
+    while(you_dont_understand_this){
+        click_while_hyperlink = 1
+        you_dont_understand_this = 0
+    }
+    ```
+    *note: always make sure to include something to trip the condition so you can exit the loop*
+  - [**For**](https://www.w3schools.com/c/c_for_loop.php) - Used for when you want to execute a code block for a defined number of intervals ex:
+    ```c
+    for(iterator=0;iterator<5;iterator++){
+        print("Printing this line")
+    }
+    ```
+  - [**Break/Continue**](https://www.simplilearn.com/tutorials/cpp-tutorial/break-and-continue-statements-cpp) - Both can be used to exit a loop but the behavior is a bit different for each
+    - Break: Stops the entire process of the loop
+    - Continue: Only stops the current iteration 
+    <details> 
+    <summary><strong>Arithmetic operators<strong></summary>
+    <strong>Arithmetic operators</strong> - Allows you to do mathematical operations on two operators
+    <table class="tg">
+    <thead>
+    <tr>
+        <th class="tg-g7sd">Full Expression</th>
+        <th class="tg-yla0">Shorthand</th>
+        <th class="tg-yla0">Explanation</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="tg-cly1">i = i + 12</td>
+        <td class="tg-cly1">i+=12</td>
+        <td class="tg-cly1">Add some value to the variable.</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">i = i - 12</td>
+        <td class="tg-cly1">i-=12</td>
+        <td class="tg-cly1">Subtract some value from the variable.</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">i = i * 12</td>
+        <td class="tg-cly1">i*=12</td>
+        <td class="tg-cly1">Multiply some value by the variable.</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">i = i / 12</td>
+        <td class="tg-cly1">i/=12</td>
+        <td class="tg-cly1">Divide some value from the variable.</td>
+    </tr>
+    </tbody>
+    </table>
+    </details>
+
+    <details> 
+    <summary><strong>Equivalency Operators</strong></summary>
+    <strong>Equivalency Operators</strong> used to compare two operators ex:
+    <table class="tg">
+    <thead>
+    <tr>
+        <th class="tg-g7sd">Condition</th>
+        <th class="tg-yla0">Symbol</th>
+        <th class="tg-yla0">Example</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="tg-cly1">Less than</td>
+        <td class="tg-cly1">&lt;</td>
+        <td class="tg-cly1">(a &lt; b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Greater than</td>
+        <td class="tg-cly1">&gt;</td>
+        <td class="tg-cly1">(a &gt; b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Less than or equal to</td>
+        <td class="tg-cly1">&lt;=</td>
+        <td class="tg-cly1">(a &lt;= b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Greater than or equal to</td>
+        <td class="tg-cly1">&gt;=</td>
+        <td class="tg-cly1">(a &gt;= b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Equal to</td>
+        <td class="tg-cly1">==</td>
+        <td class="tg-cly1">(a == b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Not equal to</td>
+        <td class="tg-cly1">!=</td>
+        <td class="tg-cly1">(a != b)</td>
+    </tr>
+    </tbody>
+    </table>
+    </details>
+
+    <details>
+    <summary><strong>Logic Operators</strong></summary>
+    <strong >Logic Operators</strong> - used to chain together operators
+    <table class="tg">
+    <thead>
+    <tr>
+        <th class="tg-g7sd">Condition</th>
+        <th class="tg-yla0">Symbol</th>
+        <th class="tg-yla0">Example</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="tg-cly1">Less than</td>
+        <td class="tg-cly1">&lt;</td>
+        <td class="tg-cly1">(a &lt; b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Greater than</td>
+        <td class="tg-cly1">&gt;</td>
+        <td class="tg-cly1">(a &gt; b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Less than or equal to</td>
+        <td class="tg-cly1">&lt;=</td>
+        <td class="tg-cly1">(a &lt;= b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Greater than or equal to</td>
+        <td class="tg-cly1">&gt;=</td>
+        <td class="tg-cly1">(a &gt;= b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Equal to</td>
+        <td class="tg-cly1">==</td>
+        <td class="tg-cly1">(a == b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Not equal to</td>
+        <td class="tg-cly1">!=</td>
+        <td class="tg-cly1">(a != b)</td>
+    </tr>
+    </tbody>
+    </table>
+    </details>
+### Best Practices 
+  - All of the primary functionality should be integrated in the ```main()``` function
+  - add newlines at the end of your code to avoid include errors
+  - always terminate statements with a ```;```
+### Things to remember
+  - When the filename for a #include is surrounded by < and >, the compiler looks for this file in standard include paths, such as /usr/include/. If the filename is surrounded by quotes, the compiler looks in the current directory.
+  - strings are just character arrays, to avoid having to add them one at a time, use strcpy ex ```strcpy([var], "Hello World!");```
+
+### Everything after this is rough notes that need to be formated
+
+---
 - Using printf you can include variables into print strings when using format strings which will dictate how theyre printed ex ```printf("Include example variable here: %s", [variable])```
     - ```%d``` Decimal
     - ```%u``` Unsigned decimal
