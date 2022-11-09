@@ -8,7 +8,7 @@
     - **int** - stores whole numbers (2 or 4 bytes)
     - **float** - stores fractional digits can store up to 7 digits (4 bytes)
     - **char** - store single character (1 byte)
-- **Pointers** - A variable that storesthe address of another variable as its value here are some key concepts as they apply to pointers
+- **Pointers** - A variable that storesthe address of another variable as its value here are some key concepts as they apply to pointers and their **unary** operators
   - **Dereference/Pointer** (```*```)
     - When used in a declaration ```int* ptr``` it creates a pointer var
     - When used anywhere else is used to dereference (reference the value stored at a pointer location) ex: ```*ptr=10```
@@ -55,89 +55,89 @@
   - The actual code you intent to execute, which should be nested within the brackets ```{}```
   - The return value, which is data you intend to pass back to the calling function. This will be denoted with the ```return``` keyword. *Note: please ensure your return value is the same type as your function prologue* 
 
-<details> 
-<summary><strong>Arithmetic operators</strong></summary>
-<strong>Arithmetic operators</strong> - Allows you to do mathematical operations on two operators
-<table class="tg">
-<thead>
-<tr>
-    <th class="tg-g7sd">Full Expression</th>
-    <th class="tg-yla0">Shorthand</th>
-    <th class="tg-yla0">Explanation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-    <td class="tg-cly1">i = i + 12</td>
-    <td class="tg-cly1">i+=12</td>
-    <td class="tg-cly1">Add some value to the variable.</td>
-</tr>
-<tr>
-    <td class="tg-cly1">i = i - 12</td>
-    <td class="tg-cly1">i-=12</td>
-    <td class="tg-cly1">Subtract some value from the variable.</td>
-</tr>
-<tr>
-    <td class="tg-cly1">i = i * 12</td>
-    <td class="tg-cly1">i*=12</td>
-    <td class="tg-cly1">Multiply some value by the variable.</td>
-</tr>
-<tr>
-    <td class="tg-cly1">i = i / 12</td>
-    <td class="tg-cly1">i/=12</td>
-    <td class="tg-cly1">Divide some value from the variable.</td>
-</tr>
-</tbody>
-</table>
-</details>
+- <details> 
+    <summary><strong>Arithmetic operators</strong></summary>
+    <strong>Arithmetic operators</strong> - Allows you to do mathematical operations on two operators
+    <table class="tg">
+    <thead>
+    <tr>
+        <th class="tg-g7sd">Full Expression</th>
+        <th class="tg-yla0">Shorthand</th>
+        <th class="tg-yla0">Explanation</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="tg-cly1">i = i + 12</td>
+        <td class="tg-cly1">i+=12</td>
+        <td class="tg-cly1">Add some value to the variable.</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">i = i - 12</td>
+        <td class="tg-cly1">i-=12</td>
+        <td class="tg-cly1">Subtract some value from the variable.</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">i = i * 12</td>
+        <td class="tg-cly1">i*=12</td>
+        <td class="tg-cly1">Multiply some value by the variable.</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">i = i / 12</td>
+        <td class="tg-cly1">i/=12</td>
+        <td class="tg-cly1">Divide some value from the variable.</td>
+    </tr>
+    </tbody>
+    </table>
+    </details>
 
-<details> 
-<summary><strong>Equivalency Operators</strong></summary>
-<strong>Equivalency Operators</strong> used to compare two operators ex:
-<table class="tg">
-<thead>
-<tr>
-    <th class="tg-g7sd">Condition</th>
-    <th class="tg-yla0">Symbol</th>
-    <th class="tg-yla0">Example</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-    <td class="tg-cly1">Less than</td>
-    <td class="tg-cly1">&lt;</td>
-    <td class="tg-cly1">(a &lt; b)</td>
-</tr>
-<tr>
-    <td class="tg-cly1">Greater than</td>
-    <td class="tg-cly1">&gt;</td>
-    <td class="tg-cly1">(a &gt; b)</td>
-</tr>
-<tr>
-    <td class="tg-cly1">Less than or equal to</td>
-    <td class="tg-cly1">&lt;=</td>
-    <td class="tg-cly1">(a &lt;= b)</td>
-</tr>
-<tr>
-    <td class="tg-cly1">Greater than or equal to</td>
-    <td class="tg-cly1">&gt;=</td>
-    <td class="tg-cly1">(a &gt;= b)</td>
-</tr>
-<tr>
-    <td class="tg-cly1">Equal to</td>
-    <td class="tg-cly1">==</td>
-    <td class="tg-cly1">(a == b)</td>
-</tr>
-<tr>
-    <td class="tg-cly1">Not equal to</td>
-    <td class="tg-cly1">!=</td>
-    <td class="tg-cly1">(a != b)</td>
-</tr>
-</tbody>
-</table>
-</details>
+- <details> 
+    <summary><strong>Equivalency Operators</strong></summary>
+    <strong>Equivalency Operators</strong> used to compare two operators ex:
+    <table class="tg">
+    <thead>
+    <tr>
+        <th class="tg-g7sd">Condition</th>
+        <th class="tg-yla0">Symbol</th>
+        <th class="tg-yla0">Example</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="tg-cly1">Less than</td>
+        <td class="tg-cly1">&lt;</td>
+        <td class="tg-cly1">(a &lt; b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Greater than</td>
+        <td class="tg-cly1">&gt;</td>
+        <td class="tg-cly1">(a &gt; b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Less than or equal to</td>
+        <td class="tg-cly1">&lt;=</td>
+        <td class="tg-cly1">(a &lt;= b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Greater than or equal to</td>
+        <td class="tg-cly1">&gt;=</td>
+        <td class="tg-cly1">(a &gt;= b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Equal to</td>
+        <td class="tg-cly1">==</td>
+        <td class="tg-cly1">(a == b)</td>
+    </tr>
+    <tr>
+        <td class="tg-cly1">Not equal to</td>
+        <td class="tg-cly1">!=</td>
+        <td class="tg-cly1">(a != b)</td>
+    </tr>
+    </tbody>
+    </table>
+    </details>
 
-<details>
+- <details>
     <summary><strong>Logic Operators</strong></summary>
     <strong >Logic Operators</strong> - used to chain together operators
     <table class="tg">
@@ -183,6 +183,38 @@
     </table>
     </details>
 
+- **Typecasting** - Typecasting ig s way to temporarily change the tyoe of a variable ex: ```(float) [variable]```
+    - Make sure to include an ```*``` after the type if youre typecasting a pointer because youre saying its a pointer to this var ex ```(int*) [pointer_variable]``` [ref](https://ecomputernotes.com/what-is-c/function-a-pointer/type-casting-of-pointers)
+
+    - Doing arithmetic on typecasted pointers (assuming youre trying to effect the underlying value) is a bad idea unless you change it to the expected value first and then back to its typecasted self ex: ```int_pointer = (char *) ((int *) int_pointer + 1)```
+        - void pointers must be typecasted before arithmetic
+        - void pointers cant be de-referenced
+- **User Input** 
+  - ```scanf``` -  to include user input as a part of your program you will need to use this function, scanf expects its arguments to be pointers so you should either use one ot use a unary (address of) operator to a varable ```&``` ex ```scanf(%d, &[VARIABLE])```
+  - **Via Args** - In order to take user input via arguments in C, you need to include two variables into your main function, (1) Your argument count (2) an arg list in a character array. ex ```int main(int argument_count, char *arg_list[])```
+- **Variable Scoping** - it is important to understand the scope of your variables as they dictate what data is available to your current function during a specific point in execution there are 3 specific scopes you need to worry about:
+  - **Global** - Global variables are variables defined outside of the main function that persist across all functions 
+  - **Static** - They remain local to a specific function but their value remains intact across functions <details><summary>ex</summary>
+        ```
+
+        #include <stdio.h>
+
+        int function()
+        {
+            static int count = 0;
+            count++;
+            return count;
+        }
+
+        void main(){
+            print("%d", function);
+            print("%d", function);
+        }
+        // will output 1 2 instead of 1 1
+        ```
+    </details>
+    
+  - **Local** - variable context is local to a function and is lost when the function leaves
 #### Best Practices 
   - All of the primary functionality should be integrated in the ```main()``` function
   - add newlines at the end of your code to avoid include errors
@@ -202,7 +234,7 @@
 
 ### Assembly
 All C programming is further translated to assembly code which is a lower level and somewhat human readable representation of the eventual machine code that is interpreted by the computer.
-### Key concepts/definition to know
+#### Key concepts/definition to know
 - Assembly is syntax formatted ```operation, [destination], [source]``` 
 - There are two major syntaxes for assembly, AT&T and Intel (Intel is a lot cleaner)
     - To set GDB to intel reference [GDB](https://github.com/adminprivileges/skillbridgreNotes/blob/main/terminal_tools.md#gdb)
@@ -248,38 +280,15 @@ All C programming is further translated to assembly code which is a lower level 
     - calls the return function which places the return address in EIP to run it next ```ret```
   - ![Stack](https://learning.oreilly.com/api/v2/epubs/urn:orm:book:9781593271442/files/httpatomoreillycomsourcenostarchimages254229.png.jpg)
 
+
+
+### Everything after this is rough notes that need to be formated
+---
 - ```malloc()``` and ```free()``` are used to allocate and deallocate space in the heap respectively
     - malloc returns a pointer with the datatype void so it must be typecasted to its expected type
 - use ```atoi()``` (ASCII to INT) to change character type to int
 
-### Everything after this is rough notes that need to be formated
-
----
-
 - When taking user input the ```scanf``` tool can only take pointers so make sure to use the ```&``` operator ex: ```scanf(%s, &[variable])```
-- You can temporarily change a varable datatype by typecasting ex: ```(float) [variable]```
-    - Make sure to include an ```*``` after the type if youre typecasting a pointer because youre saying its a pointer to this var ex ```(int*) [pointer_variable]``` [ref](https://ecomputernotes.com/what-is-c/function-a-pointer/type-casting-of-pointers)
-
-    - Doing arithmetic on typecasted pointers is a bad idea unless you change it to the expected value first and then back to its typecasted self ex: ```int_pointer = (char *) ((int *) int_pointer + 1)```
-        - void pointers must be typecasted before arithmetic
-        - void pointers cant be de-referenced
-- static variables preserve their values even when out of scope ex:
-```
-#include <stdio.h>
-
-int function()
-{
-    static int count = 0;
-    count++;
-    return count;
-}
-
-void main(){
-    print("%d", function);
-    print("%d", function);
-}
-// will output 1 2 instead of 1 1
-```
 - Four common functions that use file descriptors 
   - ```open()```: Opens a file and returns file descriptor
     - requires ```<fcntl.h>``` and ```<sys/stat.h>``` to be included to use flags
