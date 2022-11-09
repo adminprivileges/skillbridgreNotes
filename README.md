@@ -13,6 +13,8 @@
     - When used anywhere else is used to dereference (reference the value stored at a pointer location) ex: ```*ptr=10```
   - **Reference** (```&```) - Specifies address of a variable ex ```*ptr=&x```
 
+- **Comments** - Comments are text in your code that do not run but should provide information about the intended use of the code, please use comments or you will forget how you did things, comments are denoted by the double backslash ```\\``` 
+
 - **Control Structures** - Control structures are the statements that dictate the flow of execution of your code they include:
   - [**If, Else**](https://www.w3schools.com/c/c_conditions.php) - These statements dictate a decision that is made based on the result of a certain condition. ex:
     ```c
@@ -41,89 +43,100 @@
   - [**Break/Continue**](https://www.simplilearn.com/tutorials/cpp-tutorial/break-and-continue-statements-cpp) - Both can be used to exit a loop but the behavior is a bit different for each
     - Break: Stops the entire process of the loop
     - Continue: Only stops the current iteration 
-    <details> 
-    <summary><strong>Arithmetic operators<strong></summary>
-    <strong>Arithmetic operators</strong> - Allows you to do mathematical operations on two operators
-    <table class="tg">
-    <thead>
-    <tr>
-        <th class="tg-g7sd">Full Expression</th>
-        <th class="tg-yla0">Shorthand</th>
-        <th class="tg-yla0">Explanation</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td class="tg-cly1">i = i + 12</td>
-        <td class="tg-cly1">i+=12</td>
-        <td class="tg-cly1">Add some value to the variable.</td>
-    </tr>
-    <tr>
-        <td class="tg-cly1">i = i - 12</td>
-        <td class="tg-cly1">i-=12</td>
-        <td class="tg-cly1">Subtract some value from the variable.</td>
-    </tr>
-    <tr>
-        <td class="tg-cly1">i = i * 12</td>
-        <td class="tg-cly1">i*=12</td>
-        <td class="tg-cly1">Multiply some value by the variable.</td>
-    </tr>
-    <tr>
-        <td class="tg-cly1">i = i / 12</td>
-        <td class="tg-cly1">i/=12</td>
-        <td class="tg-cly1">Divide some value from the variable.</td>
-    </tr>
-    </tbody>
-    </table>
-    </details>
+- [**Functions**](https://www.w3schools.com/c/c_functions.php) - Used to perform a repetitive and uniform action multiple times with out rewriting code. The function is comprised of:
+  - The prologue which includes function return type, name of function, and parameters ex:
+    ```c
+    void make_sandwich(char *bread, char *meat, char* cheese){
+        //make the sandwich
+    }
+    ```
+    *Note: The ```void``` data type is used in situations like this where you dont expect return data*  
+  - The actual code you intent to execute, which should be nested within the brackets ```{}```
+  - The return value, which is data you intend to pass back to the calling function. This will be denoted with the ```return``` keyword. *Note: please ensure your return value is the same type as your function prologue* 
 
-    <details> 
-    <summary><strong>Equivalency Operators</strong></summary>
-    <strong>Equivalency Operators</strong> used to compare two operators ex:
-    <table class="tg">
-    <thead>
-    <tr>
-        <th class="tg-g7sd">Condition</th>
-        <th class="tg-yla0">Symbol</th>
-        <th class="tg-yla0">Example</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td class="tg-cly1">Less than</td>
-        <td class="tg-cly1">&lt;</td>
-        <td class="tg-cly1">(a &lt; b)</td>
-    </tr>
-    <tr>
-        <td class="tg-cly1">Greater than</td>
-        <td class="tg-cly1">&gt;</td>
-        <td class="tg-cly1">(a &gt; b)</td>
-    </tr>
-    <tr>
-        <td class="tg-cly1">Less than or equal to</td>
-        <td class="tg-cly1">&lt;=</td>
-        <td class="tg-cly1">(a &lt;= b)</td>
-    </tr>
-    <tr>
-        <td class="tg-cly1">Greater than or equal to</td>
-        <td class="tg-cly1">&gt;=</td>
-        <td class="tg-cly1">(a &gt;= b)</td>
-    </tr>
-    <tr>
-        <td class="tg-cly1">Equal to</td>
-        <td class="tg-cly1">==</td>
-        <td class="tg-cly1">(a == b)</td>
-    </tr>
-    <tr>
-        <td class="tg-cly1">Not equal to</td>
-        <td class="tg-cly1">!=</td>
-        <td class="tg-cly1">(a != b)</td>
-    </tr>
-    </tbody>
-    </table>
-    </details>
+<details> 
+<summary><strong>Arithmetic operators<strong></summary>
+<strong>Arithmetic operators</strong> - Allows you to do mathematical operations on two operators
+<table class="tg">
+<thead>
+<tr>
+    <th class="tg-g7sd">Full Expression</th>
+    <th class="tg-yla0">Shorthand</th>
+    <th class="tg-yla0">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td class="tg-cly1">i = i + 12</td>
+    <td class="tg-cly1">i+=12</td>
+    <td class="tg-cly1">Add some value to the variable.</td>
+</tr>
+<tr>
+    <td class="tg-cly1">i = i - 12</td>
+    <td class="tg-cly1">i-=12</td>
+    <td class="tg-cly1">Subtract some value from the variable.</td>
+</tr>
+<tr>
+    <td class="tg-cly1">i = i * 12</td>
+    <td class="tg-cly1">i*=12</td>
+    <td class="tg-cly1">Multiply some value by the variable.</td>
+</tr>
+<tr>
+    <td class="tg-cly1">i = i / 12</td>
+    <td class="tg-cly1">i/=12</td>
+    <td class="tg-cly1">Divide some value from the variable.</td>
+</tr>
+</tbody>
+</table>
+</details>
 
-    <details>
+<details> 
+<summary><strong>Equivalency Operators</strong></summary>
+<strong>Equivalency Operators</strong> used to compare two operators ex:
+<table class="tg">
+<thead>
+<tr>
+    <th class="tg-g7sd">Condition</th>
+    <th class="tg-yla0">Symbol</th>
+    <th class="tg-yla0">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td class="tg-cly1">Less than</td>
+    <td class="tg-cly1">&lt;</td>
+    <td class="tg-cly1">(a &lt; b)</td>
+</tr>
+<tr>
+    <td class="tg-cly1">Greater than</td>
+    <td class="tg-cly1">&gt;</td>
+    <td class="tg-cly1">(a &gt; b)</td>
+</tr>
+<tr>
+    <td class="tg-cly1">Less than or equal to</td>
+    <td class="tg-cly1">&lt;=</td>
+    <td class="tg-cly1">(a &lt;= b)</td>
+</tr>
+<tr>
+    <td class="tg-cly1">Greater than or equal to</td>
+    <td class="tg-cly1">&gt;=</td>
+    <td class="tg-cly1">(a &gt;= b)</td>
+</tr>
+<tr>
+    <td class="tg-cly1">Equal to</td>
+    <td class="tg-cly1">==</td>
+    <td class="tg-cly1">(a == b)</td>
+</tr>
+<tr>
+    <td class="tg-cly1">Not equal to</td>
+    <td class="tg-cly1">!=</td>
+    <td class="tg-cly1">(a != b)</td>
+</tr>
+</tbody>
+</table>
+</details>
+
+<details>
     <summary><strong>Logic Operators</strong></summary>
     <strong >Logic Operators</strong> - used to chain together operators
     <table class="tg">
@@ -175,6 +188,8 @@
 ### Things to remember
   - When the filename for a #include is surrounded by < and >, the compiler looks for this file in standard include paths, such as /usr/include/. If the filename is surrounded by quotes, the compiler looks in the current directory.
   - strings are just character arrays, to avoid having to add them one at a time, use strcpy ex ```strcpy([var], "Hello World!");```
+
+
 
 ### Everything after this is rough notes that need to be formated
 
@@ -264,21 +279,7 @@ void main(){
     - ```EIP``` (Index Pointer): Holds the offset of the next instruction. It can only be read 
 
 - x86 processor values are stored in little-endian (least sig byte first) byte order which means the byte values ```0xc7    0x45    0xfc    0x00``` would be stored in a word as ```0x00fc45c7```
-- GDB examination syntax ```x/[number(opt, default=1)][format][size(opt, default=word)] [target]``` ex: ```x/2xb $eip```
-    - format:
-        - ```o``` Display in octal.
-        - ```x``` Display in hexadecimal.
-        - ```u``` Display in unsigned, standard base-10 decimal.
-        - ```t``` Display in binary.
-        - ```i``` Display instruction
-        - ```c``` Diplay character (should prolly use with b size)
-        - ```s``` Display string
-    - size
-        - ```b``` A single byte
-        - ```h``` A halfword, which is two bytes in size
-        - ```w``` A word, which is four bytes in size
-        - ```g``` A giant, which is eight bytes in size
-- ```bt``` (Backtrace) will show you a the stack or istory of functions, ```bf ful```will show you variables as well.
+
 
 - Compiled program memory is broken into 5 segments:
     - **Text:** (Code Segment), where the assembly instructions are located. 
@@ -304,40 +305,6 @@ void main(){
 - ```malloc()``` and ```free()``` are used to allocate and deallocate space in the heap respectively
     - malloc returns a pointer with the datatype void so it must be typecasted to its expected type
 - use ```atoi()``` (ASCII to INT) to change character type to int
-
-
-# GDB Notes    - To set GDB to intel 
-- Run ```gdb -q``` to skip the copyright message
-- ```-`args``` allows you to include arguments
-- To set GDB to intel
-    ```
-    > gdb -q
-    > set dis intel
-    > quit
-    > echo "set dis intel" > ~/.gdbinit
-    ```
-- Commands
-  - ```nexti``` - Next Assembly Instruction
-  - ```r [opt_argument]``` or ```run [opt_argument]``` - Start or restart the program
-  - ```c``` or ```continue``` - Continue to the next breakpoint
-  - ```b```  or ```break``` - Set breakpoint
-    - ```info b``` - inspect breakpoints
-    -  ```disable/enable b [breakSSpoint_number]``` - disable/enable a set breakpoint
-    - ```delete [breakpoint_number]``` - delete breakpoint
-   -  ```p [variable]``` or ```print [variable]``` - print a variable or register
-   - ```set [variable]``` - set the value of a variable inline  
-   - ```bt```- backtraces the stack from the current point in execution
- -  TUI (Terminal User Interface) - a curses text interface to make gdb more usable
-    -  ```CTRL+X+A``` - Enter/Exit TUI
-    -  ```CTRL+L``` Reload display
-    -  ```layout [name]``` enters one of the specified layouts
-       -  ```asm``` - assembly
-       -  ```regs``` - registers
-       -  ```src``` - source code
-    -  ```focus [layout]``` - change your cursor focus
-       -  ```focus cmd``` - move cursor back to gdb command line
- -  ```CTRL+X+O``` - switch focus
-
 
 # Assembly
 - Assembly is syntax formatted ```operation, [destination], [source]``` 
