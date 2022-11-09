@@ -1,6 +1,6 @@
 # Art of Exploitation Notes
 ## x200 Programming
-### C Programming
+### C Basics
 #### Key concepts/definitions to know:
 - **Variables** - An object that can hold data
   - **Constant** - A type of variable that doesn't change
@@ -189,7 +189,15 @@
   - always terminate statements with a ```;```
 #### Things to remember
   - When the filename for a #include is surrounded by < and >, the compiler looks for this file in standard include paths, such as /usr/include/. If the filename is surrounded by quotes, the compiler looks in the current directory.
-  - strings are just character arrays, to avoid having to add them one at a time, use strcpy ex ```strcpy([var], "Hello World!");```
+  - strings are just character arrays, to avoid having to add them one at a time, use strcpy ex ```strcpy([var], "Hello World!");``` but make sure that the string can fit in the allocated buffer for that variable (we'll talk more about why later)
+  - ***Fortmat strings*** - in C you can use ```printf()``` to pring variables in a non-sting form ex: ```printf("Include example variable here: %s", [variable])```
+    - ```%d``` Decimal
+    - ```%u``` Unsigned decimal
+    - ```%x``` Hexadecimal
+    - ```%s``` String
+    - ```%n``` Number of bytes written so far
+    - ```%p```  Memory Address
+- You can pad a number with 0s by prepending a format string with a number ex ```03%d```
 
 
 ### Assembly
@@ -214,8 +222,8 @@ All C programming is further translated to assembly code which is a lower level 
 
 - x86 processor values are stored in little-endian (least sig byte first) byte order which means the byte values ```0xc7    0x45    0xfc    0x00``` would be stored in a word as ```0x00fc45c7```
 
-
-- Compiled program memory is broken into 5 segments:
+- <details>
+    <summary>Compiled program memory is broken into 5 segments:</summary>
     - **Text:** (Code Segment), where the assembly instructions are located. 
         - Read Only
 
@@ -225,17 +233,21 @@ All C programming is further translated to assembly code which is a lower level 
         - Writable, but fixed in size
     - **Heap:** directly controlled by the programmer, writes downward towards higher memory addresses
     - **Stack:** used to store local function variables and context during function calls (what ```bt``` looks at) grows upards towards lower memory
-- When a function is called a stack frame is pushed to the stack [Check out this youtube video](https://www.youtube.com/watch?v=vcfQVwtoyHY&list=PL_9C1QR5FDr2GZVhwajY_uWUPzkzCPMeK). 
-    - frame contains function parameters, its local variables and the: 
-        - SFP (saved frame pointer), used to restore EIP to previous value
-        - return address, used to restore EIP to the next inst after the function call
-![Stack](https://learning.oreilly.com/api/v2/epubs/urn:orm:book:9781593271442/files/httpatomoreillycomsourcenostarchimages254229.png.jpg)
-    - when going from main to funct
-        - parameters are added to the ESP
-        - Main ebp becomes SFP
-        - funct EBP sits between SFP and return address
-        - next instruction becomes return address
-        - variables are added on top of funct ebp 
+  </details>
+- **Function Calls** - function calls have three important parts which are the **function prologue**, the **function call** and the **function epilogue**  
+  - **Function Prologue**:
+    - Pushes EBP to the stack so that it can be restored to its place in the calling function later ```push ebp```
+    - The value of the base pointer is set to the address of the ESP (top of the stack) ```mov ebp, esp```
+    - ESP gets moved to create memory space for the local variables ```sub esp, 15``` 
+  - **Function call**:
+    - pushes the function arguments to the stack (in reverse order)
+    - Pushes return address (the next instruction) to the stack 
+  - **Function epilogue**  
+    - Drops stack pointer to the base pointer ```mov esp, ebp```
+    - pops base pointer off the stack to be restored to its previous value ```pop ebp```
+    - calls the return function which places the return address in EIP to run it next ```ret```
+  - ![Stack](https://learning.oreilly.com/api/v2/epubs/urn:orm:book:9781593271442/files/httpatomoreillycomsourcenostarchimages254229.png.jpg)
+
 - ```malloc()``` and ```free()``` are used to allocate and deallocate space in the heap respectively
     - malloc returns a pointer with the datatype void so it must be typecasted to its expected type
 - use ```atoi()``` (ASCII to INT) to change character type to int
@@ -243,14 +255,7 @@ All C programming is further translated to assembly code which is a lower level 
 ### Everything after this is rough notes that need to be formated
 
 ---
-- Using printf you can include variables into print strings when using format strings which will dictate how theyre printed ex ```printf("Include example variable here: %s", [variable])```
-    - ```%d``` Decimal
-    - ```%u``` Unsigned decimal
-    - ```%x``` Hexadecimal
-    - ```%s``` String
-    - ```%n``` Number of bytes written so far
-    - ```%p```  Memory Address
-- You can pad a number with 0s by prepending a format string with a number ex ```03%d```
+
 - When taking user input the ```scanf``` tool can only take pointers so make sure to use the ```&``` operator ex: ```scanf(%s, &[variable])```
 - You can temporarily change a varable datatype by typecasting ex: ```(float) [variable]```
     - Make sure to include an ```*``` after the type if youre typecasting a pointer because youre saying its a pointer to this var ex ```(int*) [pointer_variable]``` [ref](https://ecomputernotes.com/what-is-c/function-a-pointer/type-casting-of-pointers)
