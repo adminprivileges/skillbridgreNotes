@@ -56,7 +56,7 @@
   - The return value, which is data you intend to pass back to the calling function. This will be denoted with the ```return``` keyword. *Note: please ensure your return value is the same type as your function prologue* 
 
 <details> 
-<summary><strong>Arithmetic operators<strong></summary>
+<summary><strong>Arithmetic operators</strong></summary>
 <strong>Arithmetic operators</strong> - Allows you to do mathematical operations on two operators
 <table class="tg">
 <thead>
@@ -199,9 +199,9 @@ All C programming is further translated to assembly code which is a lower level 
 - There are two major syntaxes for assembly, AT&T and Intel (Intel is a lot cleaner)
     - To set GDB to intel reference [GDB](https://github.com/adminprivileges/skillbridgreNotes/blob/main/terminal_tools.md#gdb)
 - <details>
-  <summary><strong>Registers</strong> a register is a small bit of memory that sits inside the CPU. and is used by assembly language to perform various tasks. </summary>
-  
-    - ```EAX``` (Accumulator regiSster): It is used for I/O port access, arithmetic, interrupt calls, etc
+  <summary><strong>Registers</strong> - a register is a small bit of memory that sits inside the CPU. and is used by assembly language to perform various tasks. </summary>
+
+    - ```EAX``` (Accumulator register): It is used for I/O port access, arithmetic, interrupt calls, etc
     - ```EBX``` (Base register): It is used as a base pointer for memory access. Gets some interrupt return values
     - ```ECX``` (Counter register): It is used as a loop counter and for shifts. Gets some interrupt values
     - ```EDX``` (Data register): It is used for I/O port access, arithmetic, some interrupt calls.
