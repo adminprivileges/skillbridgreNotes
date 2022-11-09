@@ -1,6 +1,7 @@
 # Art of Exploitation Notes
 ## x200 Programming
-### Key definfitions to know:
+### C Programming
+#### Key concepts/definitions to know:
 - **Variables** - An object that can hold data
   - **Constant** - A type of variable that doesn't change
   - **Variable (Data) types**
@@ -181,15 +182,63 @@
     </tbody>
     </table>
     </details>
-### Best Practices 
+
+#### Best Practices 
   - All of the primary functionality should be integrated in the ```main()``` function
   - add newlines at the end of your code to avoid include errors
   - always terminate statements with a ```;```
-### Things to remember
+#### Things to remember
   - When the filename for a #include is surrounded by < and >, the compiler looks for this file in standard include paths, such as /usr/include/. If the filename is surrounded by quotes, the compiler looks in the current directory.
   - strings are just character arrays, to avoid having to add them one at a time, use strcpy ex ```strcpy([var], "Hello World!");```
 
 
+### Assembly
+All C programming is further translated to assembly code which is a lower level and somewhat human readable representation of the eventual machine code that is interpreted by the computer.
+### Key concepts/definition to know
+- Assembly is syntax formatted ```operation, [destination], [source]``` 
+- There are two major syntaxes for assembly, AT&T and Intel (Intel is a lot cleaner)
+    - To set GDB to intel reference [GDB](https://github.com/adminprivileges/skillbridgreNotes/blob/main/terminal_tools.md#gdb)
+- <details>
+  <summary><strong>Registers</strong> a register is a small bit of memory that sits inside the CPU. and is used by assembly language to perform various tasks. </summary>
+  
+    - ```EAX``` (Accumulator regiSster): It is used for I/O port access, arithmetic, interrupt calls, etc
+    - ```EBX``` (Base register): It is used as a base pointer for memory access. Gets some interrupt return values
+    - ```ECX``` (Counter register): It is used as a loop counter and for shifts. Gets some interrupt values
+    - ```EDX``` (Data register): It is used for I/O port access, arithmetic, some interrupt calls.
+    - ```EDI``` (Destination index):Used for string, memory array copying and setting and for far pointer addressing with EDI
+    - ```ESI``` (Source index): Used for string and memory array copying
+    - ```EBP``` (Stack Base pointer): Holds the base address of the stack
+    - ```ESP``` (Stack pointer): Holds the top address of the stack
+    - ```EIP``` (Index Pointer): Holds the offset of the next instruction. It can only be read
+  </details>
+
+- x86 processor values are stored in little-endian (least sig byte first) byte order which means the byte values ```0xc7    0x45    0xfc    0x00``` would be stored in a word as ```0x00fc45c7```
+
+
+- Compiled program memory is broken into 5 segments:
+    - **Text:** (Code Segment), where the assembly instructions are located. 
+        - Read Only
+
+    - **Data:** used to store initialized global and static variables
+        - Writable, but fixed in size
+    - **BSS:**  used for uninitialized g&s variables
+        - Writable, but fixed in size
+    - **Heap:** directly controlled by the programmer, writes downward towards higher memory addresses
+    - **Stack:** used to store local function variables and context during function calls (what ```bt``` looks at) grows upards towards lower memory
+- When a function is called a stack frame is pushed to the stack [Check out this youtube video](https://www.youtube.com/watch?v=vcfQVwtoyHY&list=PL_9C1QR5FDr2GZVhwajY_uWUPzkzCPMeK). 
+    - frame contains function parameters, its local variables and the: 
+        - SFP (saved frame pointer), used to restore EIP to previous value
+        - return address, used to restore EIP to the next inst after the function call
+![Stack](https://learning.oreilly.com/api/v2/epubs/urn:orm:book:9781593271442/files/httpatomoreillycomsourcenostarchimages254229.png.jpg)
+    - when going from main to funct
+        - parameters are added to the ESP
+        - Main ebp becomes SFP
+        - funct EBP sits between SFP and return address
+        - next instruction becomes return address
+        - variables are added on top of funct ebp 
+- ```malloc()``` and ```free()``` are used to allocate and deallocate space in the heap respectively
+    - malloc returns a pointer with the datatype void so it must be typecasted to its expected type
+- use ```atoi()``` (ASCII to INT) to change character type to int
 
 ### Everything after this is rough notes that need to be formated
 
@@ -257,93 +306,7 @@ void main(){
   
 
 
-- Assembly is syntax formatted ```operation, [destination], [source]``` 
-- There are two major syntaxes for assembly, AT&T and Intel (Intel is a lot cleaner)
-    - To set GDB to intel 
-        ```
-        > gdb -q
-        > set dis intel
-        > quit
-        > echo "set dis intel" > ~/.gdbinit
-        ```
-- The ```-g``` flag can be used by gcc to include extra debugging information, which will give GDB access to the source code.
-- Registers
-    - ```EAX``` (Accumulator regiSster): It is used for I/O port access, arithmetic, interrupt calls, etc
-    - ```EBX``` (Base register): It is used as a base pointer for memory access. Gets some interrupt return values
-    - ```ECX``` (Counter register): It is used as a loop counter and for shifts. Gets some interrupt values
-    - ```EDX``` (Data register): It is used for I/O port access, arithmetic, some interrupt calls.
-    - ```EDI``` (Destination index):Used for string, memory array copying and setting and for far pointer addressing with EDI
-    - ```ESI``` (Source index): Used for string and memory array copying
-    - ```EBP``` (Stack Base pointer): Holds the base address of the stack
-    - ```ESP``` (Stack pointer): Holds the top address of the stack
-    - ```EIP``` (Index Pointer): Holds the offset of the next instruction. It can only be read 
 
-- x86 processor values are stored in little-endian (least sig byte first) byte order which means the byte values ```0xc7    0x45    0xfc    0x00``` would be stored in a word as ```0x00fc45c7```
-
-
-- Compiled program memory is broken into 5 segments:
-    - **Text:** (Code Segment), where the assembly instructions are located. 
-        - Read Only
-
-    - **Data:** used to store initialized global and static variables
-        - Writable, but fixed in size
-    - **BSS:**  used for uninitialized g&s variables
-        - Writable, but fixed in size
-    - **Heap:** directly controlled by the programmer, writes downward towards higher memory addresses
-    - **Stack:** used to store local function variables and context during function calls (what ```bt``` looks at) grows upards towards lower memory
-- When a function is called a stack frame is pushed to the stack [Check out this youtube video](https://www.youtube.com/watch?v=vcfQVwtoyHY&list=PL_9C1QR5FDr2GZVhwajY_uWUPzkzCPMeK). 
-    - frame contains function parameters, its local variables and the: 
-        - SFP (saved frame pointer), used to restore EIP to previous value
-        - return address, used to restore EIP to the next inst after the function call
-![Stack](https://learning.oreilly.com/api/v2/epubs/urn:orm:book:9781593271442/files/httpatomoreillycomsourcenostarchimages254229.png.jpg)
-    - when going from main to funct
-        - parameters are added to the ESP
-        - Main ebp becomes SFP
-        - funct EBP sits between SFP and return address
-        - next instruction becomes return address
-        - variables are added on top of funct ebp 
-- ```malloc()``` and ```free()``` are used to allocate and deallocate space in the heap respectively
-    - malloc returns a pointer with the datatype void so it must be typecasted to its expected type
-- use ```atoi()``` (ASCII to INT) to change character type to int
-
-# Assembly
-- Assembly is syntax formatted ```operation, [destination], [source]``` 
-- There are two major syntaxes for assembly, AT&T and Intel (Intel is a lot cleaner)
-    - To set GDB to intel 
-        ```
-        > gdb -q
-        > set dis intel
-        > quit
-        > echo "set dis intel" > ~/.gdbinit
-        ```
-- The ```-g``` flag can be used by gcc to include extra debugging information, which will give GDB access to the source code.
-- Registers
-    - ```EAX``` (Accumulator regiSster): It is used for I/O port access, arithmetic, interrupt calls, etc
-    - ```EBX``` (Base register): It is used as a base pointer for memory access. Gets some interrupt return values
-    - ```ECX``` (Counter register): It is used as a loop counter and for shifts. Gets some interrupt values
-    - ```EDX``` (Data register): It is used for I/O port access, arithmetic, some interrupt calls.
-    - ```EDI``` (Destination index):Used for string, memory array copying and setting and for far pointer addressing with EDI
-    - ```ESI``` (Source index): Used for string and memory array copying
-    - ```EBP``` (Stack Base pointer): Holds the base address of the stack
-    - ```ESP``` (Stack pointer): Holds the top address of the stack
-    - ```EIP``` (Index Pointer): Holds the offset of the next instruction. It can only be read 
-
-- x86 processor values are stored in little-endian (least sig byte first) byte order which means the byte values ```0xc7    0x45    0xfc    0x00``` would be stored in a word as ```0x00fc45c7```
-- GDB examination syntax ```x/[number(opt, default=1)][format][size(opt, default=word)] [target]``` ex: ```x/2xb $eip```
-    - format:
-        - ```o``` Display in octal.
-        - ```x``` Display in hexadecimal.
-        - ```u``` Display in unsigned, standard base-10 decimal.
-        - ```t``` Display in binary.
-        - ```i``` Display instruction
-        - ```c``` Diplay character (should prolly use with b size)
-        - ```s``` Display string
-    - size
-        - ```b``` A single byte
-        - ```h``` A halfword, which is two bytes in size
-        - ```w``` A word, which is four bytes in size
-        - ```g``` A giant, which is eight bytes in size
-- ```bt``` (Backtrace) will show you a the stack or istory of functions, ```bf ful```will show you variables as well.
 
 ## x400
 ## Networking
