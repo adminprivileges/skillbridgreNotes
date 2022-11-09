@@ -191,9 +191,11 @@
         - void pointers cant be de-referenced
 - **User Input** 
   - ```scanf``` -  to include user input as a part of your program you will need to use this function, scanf expects its arguments to be pointers so you should either use one ot use a unary (address of) operator to a varable ```&``` ex ```scanf(%d, &[VARIABLE])```
+    - if you want to grab user input but you also need spaces you can use a scanset char ```[]``` which says "read only" the trick is to combine with a not operator ```^``` to make it act as"read until" ex:  ```scanf("%[^\n]s", [variable])``` this will take all user input until a newline is sent into one string.   
   - **Via Args** - In order to take user input via arguments in C, you need to include two variables into your main function, (1) Your argument count (2) an arg list in a character array. ex ```int main(int argument_count, char *arg_list[])```
 - **Variable Scoping** - it is important to understand the scope of your variables as they dictate what data is available to your current function during a specific point in execution there are 3 specific scopes you need to worry about:
   - **Global** - Global variables are variables defined outside of the main function that persist across all functions 
+    - You can use the ```#define``` directive to set global constants
   - **Static** - They remain local to a specific function but their value remains intact across functions <details><summary>ex</summary>
         ```
 
@@ -213,8 +215,13 @@
         // will output 1 2 instead of 1 1
         ```
     </details>
-    
+
   - **Local** - variable context is local to a function and is lost when the function leaves
+  - **Structs** - these are kind of like classes in that they can hold multiple variables which can be held by a struct and referenced as such. Theres 3 different ways to access elements in a struct
+    - The sensible way (Direct access): ```[Struct].[element]```
+    - Via a pointer to the struct (arrow operator): ```[pointer]->[element]```
+    - Typecasting the pointer then dereferencing the value out (assuming you know how the data is store in memory): ```*((int *) [pointer])```
+  
 #### Best Practices 
   - All of the primary functionality should be integrated in the ```main()``` function
   - add newlines at the end of your code to avoid include errors
@@ -264,6 +271,8 @@ All C programming is further translated to assembly code which is a lower level 
     - **BSS:**  used for uninitialized g&s variables
         - Writable, but fixed in size
     - **Heap:** directly controlled by the programmer, writes downward towards higher memory addresses
+      - ```malloc()``` and ```free()``` are used to allocate and deallocate space in the heap respectively
+        - malloc returns a pointer with the datatype void so it must be typecasted to its expected type
     - **Stack:** used to store local function variables and context during function calls (what ```bt``` looks at) grows upards towards lower memory
   </details>
 - **Function Calls** - function calls have three important parts which are the **function prologue**, the **function call** and the **function epilogue**  
@@ -279,17 +288,16 @@ All C programming is further translated to assembly code which is a lower level 
     - pops base pointer off the stack to be restored to its previous value ```pop ebp```
     - calls the return function which places the return address in EIP to run it next ```ret```
   - ![Stack](https://learning.oreilly.com/api/v2/epubs/urn:orm:book:9781593271442/files/httpatomoreillycomsourcenostarchimages254229.png.jpg)
+#### Things to remember
+- As a program executes, the EIP is set to the first instruction in the text segment. The processor then follows an execution loop that does the following:
+  - Reads the instruction that EIP is pointing to
+  - Adds the byte length of the instruction to EIP
+  - Executes the instruction that was read in step 1
+  - Goes back to step 1
 
-
-
-### Everything after this is rough notes that need to be formated
----
-- ```malloc()``` and ```free()``` are used to allocate and deallocate space in the heap respectively
-    - malloc returns a pointer with the datatype void so it must be typecasted to its expected type
-- use ```atoi()``` (ASCII to INT) to change character type to int
-
-- When taking user input the ```scanf``` tool can only take pointers so make sure to use the ```&``` operator ex: ```scanf(%s, &[variable])```
-- Four common functions that use file descriptors 
+### File I/O
+In C files are handled by 2 different ways file descriptors and file streams. File descriptors are the preferred method as they use lower level I/O functions. 
+- There are four common functions that use file descriptors 
   - ```open()```: Opens a file and returns file descriptor
     - requires ```<fcntl.h>``` and ```<sys/stat.h>``` to be included to use flags
     - Open flags include:
@@ -311,14 +319,10 @@ All C programming is further translated to assembly code which is a lower level 
   - ```close()```: fd is the only arg
   - ```read()```: 
   - ```write()```: combine with int (usually ```strlen``` to know how much to write) 
-  - Structs are kind of like classes in that they can hold multiple variables which can be held by a struct and referenced as such. Theres 3 different ways to access elements in a struct
-    - The sensible way (Direct access): ```[Struct].[element]```
-    - Via a pointer to the struct (arrow operator): ```[pointer]->[element]```
-    - Typecasting the pointer then dereferencing the value out (assuming you know how the data is store in memory): ```*((int *) [pointer])```
-    - if you want to grab user input but you also need spaces you can use a scanset char ```[]``` which says "read only" the trick is to combine with a not operator ```^``` to make it act as"read until" ex:  ```scanf("%[^\n]s", [variable])``` this will take all user input until a newline is sent into one string.   
-  - You can use the ```#define``` directive to set global constants
-  
 
+### Everything after this is rough notes that need to be formated
+---
+- use ```atoi()``` (ASCII to INT) to change character type to int
 
 
 
