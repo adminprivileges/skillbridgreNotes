@@ -320,14 +320,106 @@ In C files are handled by 2 different ways file descriptors and file streams. Fi
   - ```read()```: 
   - ```write()```: combine with int (usually ```strlen``` to know how much to write) 
 
+## x300 Exploitation
+### Buffer Overflow
+#### Key concepts/definitions to know
+- **Buffer Overflow** - When data written into a buffer (an allocation of memory) overides the boundaries of said buffer and spills into adjacent memory locations.
+  - When data is overwritten it flows to higher addresses (remember, the stack grows to lower addresses)
+- In a function, since data is placed on the stack in reverse order, variables defined before other variables are susceptible to being overwritten.
+  - <details><summary>ex:</summary>
+    ```c
+    void main(){
+      int var1;
+      char var2[20];
+    }
+    ```
+    *Note: In this scenario, if more than 20 bytes are written into the var2 character buffer, the remainder could overflow into var 1*
+    </details>
+
+- Because of this same concept, the lack of input validation can also lead to execution flow control if a hacker can overflow user-defined data into the return address
+  - ![pic](https://www.mkdynamics.net/current_projects/computer_security/images/Basic_Linux_exploits/buffer_overflow_image.jpeg) 
+  - When overflowing a buffer, there are two ways you can find the offset from the variable you control to the return address. You can 
+    - Use an ever growing input repeating your return address until youre sucessful (Easier with command line argument stuff).
+    - Use ```msf-pattern-create``` to make a unique byte array to overflow your return address and then ```msf-pattern_offset``` to find the specific size (Easier if your debugging info is more robust)
+      - <details>
+  
+        ```bash
+        msf-pattern_create -l 800 #will create a 800m byte buffer
+        msf-pattern_offset -l 800 -q [RETURN_POINTER_VALUE] #will take the value from your return pointer ant tell you the offset from your variable
+        ```
+        </details>
+- The ```strcpy()``` function alone does not institute input validation, and without it can make programs susceptible to overflow attacks
+### NOP Sleds
+- One of the most famous types of a buffer overflow exploit is the NOP (No Operation) Sled. In this technique, the hacker tries to land the return address to a range of memory addresses that feed sequentially into desired shellcode. Check out [this](https://www.coengoedegebure.com/buffer-overflow-attacks-explained/) link for a full rundown.
+- There Are three major parts to this exploit all equally as important.
+![exploit](https://learning.oreilly.com/api/v2/epubs/urn:orm:book:9781593271442/files/httpatomoreillycomsourcenostarchimages254213.png.jpg)
+  - **NOP Sled** - A single byte assembly instruction that does absolutley nothing and pushes you to the next instruction.
+  ![Sled](https://www.coengoedegebure.com/content/images/2018/08/nopsled_slide.png)
+  - **Shell Code** - These can come in all different flavors, but by in large they are some form of command line invocation (usually just executes /bin/sh)
+  - **Return Address** - The return address redirects the executino flow to land somewhere within the NOP sled.  
+- While predicting a location in memory to point to in order to hop on the sled can be a bit difficult with a dynamically changing stack, one trick is to use a predictable memory location such as th address of a function call argument (since these will always be before the rest of the stack frame, just make sure your sled isnt big enough to override these too) and subtract an offset in order to find a spot within the sled, this may take trial and error but you can automate it with a bit of scripting. ex:
+  - ``` 
+    ret = (unsigned int) &i - offset; // Set return address.
+    ```
+### Environmental Variables
+- In some situations you may be dealing with a buffer that is too small for you to include a large NOP sled and  in the offset between your variable and the return pointer. In this case we have to be a bit more cognizant about the space we occupy. Thankfully shellcode can be placed in more locations than just the stack frame of this particular function.
+- It is important to note that user environment variables are stored on the stack as well and when a program is run under the context of a specific user (even if it has suid root privileges) the stack will contain that specific users environment variables, this location is static but can shift a bit given certain factors such as the program's name
+  -  To combat this, you can either use a NOP sled, or predict where this location will be. Thankfully this is easier with the ```getenv()``` function (with a few tweaks) 
+     -  <details> <summary>getenvaddr.c</summary>
+        
+        ```c
+        #include <stdio.h>
+        #include <stdlib.h>
+        #include <string.h>
+
+        int main(int argc, char *argv[]) {
+          char *ptr;
+
+          if(argc < 3) {
+              printf("Usage: %s <environment var> <target program name>\n", argv[0]);
+              exit(0);
+          }
+          ptr = getenv(argv[1]); /* Get env var location. */
+          ptr += (strlen(argv[0]) - strlen(argv[2]))*2; /* Adjust for program name. */
+          printf("%s will be at %p\n", argv[1], ptr);
+        }
+        ```
+        *Note: There is a two byte difference in environmental variable location per one byte of program name increase*
+      </details>
+
+### Heap Overflows
+- The main thing of note in heap based overflow attacks is that these are going to be largely focused on overriding certain variables to control program functionality rather than execution flow.
+  - This simply means that the end goal of the exploits are going to be largely dependant on the functionality of thr program. 
+-  In the context of this book, while the heap may be dynamically allocated, variables that reside int he heap are sequential in nature and can be overwritten into one another.  
+-  Since the heap grows Higher into increased memory addresses, variables overflow in the order in which they are initialized in the program. 
+### Function Pointer Overflow
+- Function pointers, like any other variable can be overflowed, when a function pointer is referenced in a variable initialization in something like a struct, or even another function, the rules of regular buffer overflow still apply, if you can find the offset of the two variables and use input to overflow and override  a function pointer, you can control execution flow when it comes time for that function pointer to be referenced.
+- ```nm``` can be used to list the addresses of various functions in a program in case you want to call a seperate function versus using shellcode. 
+### Format Strings
+We reference format strings [earlier](https://github.com/adminprivileges/skillbridgreNotes#things-to-remember) in the notes, but what we fail to mention is the fact that ther are stored alongside the variable in the stack when a ```printf()``` function is called. To learn more about this, check out [this link](https://axcheron.github.io/exploit-101-format-strings/) . 
+- Since format strings are stored on the stack, if proper input control validation isn't exercised, then the address of the format string can be overflowed leading to arbirtary memory read and write capabilities.
+- Similar to ```scanf()```, ```printf``` has the ability to be abused to allow for overflow without proper input validation. 
+  - The biggest countermeasure for this is to only accept input in the form of a format string to ensure that ```printf()``` interprets the totality of the argument it is sent as one contiguous string. This is done by using ```printf(%, [VARIABLE])``` instead of ```printf([VARIABLE])``` .  
+    - <details> <summary>example output</summary>
+
+        ```
+        reader@hacking:~/booksrc $ ./fmt_vuln testing %x
+        The right way to print user-controlled input:
+        testing%x
+        The wrong way to print user-controlled input:
+        testingbffff3e0
+        ```
+        *Note: In the same way that ```testing %x``` can be used to examine the next memory address, this can be repeated indefinitely to read stack memory*
+    </details>
+
+
+
 ### Everything after this is rough notes that need to be formated
 ---
 - use ```atoi()``` (ASCII to INT) to change character type to int
 
-
-
 ## x400
-## Networking
+##E Networking
 - There are two kinds of sockets
   - Stream Sockets: Used for TCP
   - Datagram Sockets: Used for TCP
