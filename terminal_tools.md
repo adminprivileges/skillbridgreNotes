@@ -1,6 +1,112 @@
 # Terminal Tools
 Here i just plan on including some useful terminal tools as well as optional configurations and flags. 
+## Bash
 
+- ``` #!/bin/bash -x ``` means that it produces additional debug
+- Variables are very useful, but even more powerful, you can use shell expansion to allocate commands to variables so that: ``` var=$(date) = var=`date` ```
+  - if youre experiencing trpuble try adding the following to your ~/.bashrc 
+```
+shopt -s expand_aliases
+```
+- arguments are denpted with $1 and $2
+- $? will be your exit status
+- ```read``` will capture your user input
+  - \-p specifies a prompt displayed to the user
+  - \-s makes it silent (doesnt show user input)
+### Flow control
+**If statements** 
+```
+if <TEST> 
+then 
+   <ACTION> 
+fi
+```
+- && (AND) only works in a successful command execution
+- || (OR) can be added as a condition if command is unsuccessful 
+  - or you can use it as a regular logical OR 
+
+**For Loops**
+```
+for var-name in <LIST> 
+do 
+   <ACTION>
+done
+```
+(FOR loops can be done in one liners using semicolons)
+```
+for ip in $(seq 1 10); do echo 11.22.33.$ip; done 
+```
+also you can use brace expansion
+```
+for ip in {1..10}; do echo 11.22.33.$ip; done 
+```
+**While Loops**
+```
+while [ $counter -le 10 ]
+do
+   echo "11.22.33.$counter" 
+   ((counter++)) #arethmatic expansion
+done
+```
+also dont forget with these loops ```-lt``` is thess than ```-le``` is less than or equal to
+
+**Functions**
+These are cool for object oriented programming (not writing the same stuff over and over) they can be declared in two ways (personal preference) 
+```
+function <FUNCTION NAME>
+   { 
+commands
+}
+```
+OR 
+```
+<FUNCTION NAME> () {
+commands
+}
+```
+**Hot Tip**
+remember all variables declared are global variables unless specified with the ```local``` tag 
+
+### Text Manipulation
+#### Cut
+The "cut" command is a very useful tool used to split text based on certain delimitters that can be specified with arguments for example the following command will slice an /etc shadow revealing users on a system:
+```cut -d ":" -f 1 /etc/passwd``` 
+
+Before:
+```
+root:$6$Dg3C//iX$Xb3iok11zP0LiXvW.w/fHweiyKrpSE.0NNthRx4T4jj3IFawLJux1pSoippJ0di2nVHcSv9sK4L3RF2qf15ee/:17764:0:99999:7:::
+daemon:*:17752:0:99999:7:::
+bin:*:17752:0:99999:7:::
+sys:*:17752:0:99999:7:::
+sync:*:17752:0:99999:7:::
+games:*:17752:0:99999:7:::
+man:*:17752:0:99999:7:::
+lp:*:17752:0:99999:7:::
+mail:*:17752:0:99999:7:::
+news:*:17752:0:99999:7:::
+uucp:*:17752:0:99999:7:::
+proxy:*:17752:0:99999:7:::
+```
+After
+```
+root
+daemon
+bin
+sys
+sync
+games
+man
+lp
+mail
+news
+uucp
+proxy
+```
+#### Awk
+the awk command is more robust, but has a bit more of a learning curve you can achieve the same results as the above command by using this in awk
+```
+cat /etc/shadow | awk -F ":" '{print $1}' 
+```
 ## Debugging
 ### GDB 
 A useful command line tool for debugging code.
@@ -14,6 +120,7 @@ A useful command line tool for debugging code.
     > quit
     > echo "set dis intel" > ~/.gdbinit
     ```
+- In order to see more verbose debugging infomration include the ```-g``` flag when compiling with ```gcc```, this will give GDB access to the source code, vars, etc. 
 ### Commands
   - ```nexti``` - Next Assembly Instruction
   - ```r [opt_argument]``` or ```run [opt_argument]``` - Start or restart the program
@@ -92,5 +199,3 @@ tcpdump -i eth0 -nn -s0 -v -A src [IP_ADDRESS] and dst port [PORT]
 - ```-nn``` 1 ```n``` disables name resolution 2 ```n```s disable name and port resolution
 - ```-v``` increase verbosity
 - ```-A``` include ASCII strings to help readability 
-
-
