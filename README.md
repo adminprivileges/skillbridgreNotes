@@ -595,6 +595,7 @@ When your data is moved over the internet, layers 1-3 facilitate actually gettin
   - ```
      connect(int fd, struct sockaddr *remote_host, socklen_t addr_length) 
     ```
+    *Note: ```socklen_t``` is a data type for an unsigned 32bit int for a network address*
 -  **Binding** sockets is done via pairing a sockets with a local address in order to listen to connections. The function looks like this:
    -  ```
         bind(int fd, struct sockaddr *local_addr, socklen_t addr_length)
@@ -613,6 +614,7 @@ When your data is moved over the internet, layers 1-3 facilitate actually gettin
       recv(int fd, void *buffer, size_t n, int flags)
       ```
     
+  - All of these functions should return a ```-1``` if an error occurs which can be used in an if statement for error checking if the output is ```== -1```
   - Many of these functions reference a ```sockaddr``` struct. This struct contains the infomration necessary to define a host given that there are many different ways a single host can be addressed depending on the protocol
      - ```SOCKADDR_COMMON``` is an unsigned int used to represent the family of addresses along with the rest of the strcture for its saved data .
      - These different sockaddr structures are all the same size allowing for them to be typecasted into one another. 
