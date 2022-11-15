@@ -578,8 +578,8 @@ In order to make this more modular the OSI model was created as a conceptual mod
 6. **Presentation Layer** - responsible for ensuring the data is presented in a usable format, also where encryption happens
 7. **Application Layer** - Allows applications to access networked services. 
 When your data is moved over the internet, layers 1-3 facilitate actually getting your data from point a to point b. Layers 4-7 enable the underlying communication between the computers to occur in a uniform fashion.   
-## Sockets
-### Key concepts/definitions to know
+### Sockets
+#### Key concepts/definitions to know
 - **Sockets** - the pairing of an IP address with a Port, or otherwise a connection endpoint. This happens at layer 5 although it influences the structure of layer 4. 
 - There are two kinds of sockets
   - Stream Sockets: Used for TCP
@@ -618,7 +618,7 @@ When your data is moved over the internet, layers 1-3 facilitate actually gettin
   - Many of these functions reference a ```sockaddr``` struct. This struct contains the infomration necessary to define a host given that there are many different ways a single host can be addressed depending on the protocol
      - ```SOCKADDR_COMMON``` is an unsigned int used to represent the family of addresses along with the rest of the strcture for its saved data .
      - These different sockaddr structures are all the same size allowing for them to be typecasted into one another. 
-### AF_INET
+#### AF_INET
 - ```AF_INET``` is the address family under the ```PF_INET``` protocol family, Together this pair reporesent IPv4. THe address structure shown in the ```netinet/in.h``` file is as shown
   - ```
       /* Structure describing an Internet socket address.  */
@@ -635,10 +635,31 @@ When your data is moved over the internet, layers 1-3 facilitate actually gettin
               sizeof (struct in_addr)];
          };
     ```
+    ![struct](https://learning.oreilly.com/api/v2/epubs/urn:orm:book:9781593271442/files/httpatomoreillycomsourcenostarchimages254410.png.jpg)
     - ```SOCKADDR_COMMON``` in this context defines our address family (IPv4)
     - Next is the port which is a 16 bit short between 0-FFFF
     - next is a 32 bit IP address
     - Lastly, 8 bits pad out the rest of the address
+      - *Note: The host and network addresses in this struct are expected to be in big endian order regardless of architecture so there are translation functions to ensure this is done as such*
+        - ```htonl(long value)``` - Host-to-Network Long
+        - ``` ntohl(long value)``` - Network-to-Host Long
+    - Since these structs are a bit different from the simple IP addresses we use there are a couple different functions that deal with translation of an ascii string representation of an IP address to an in_addr struct they are.
+      -  ```inet_aton(char *ascii_addr, struct in_addr *network_addr)```
+      -  ```inet_ntoa(struct in_addr *network_addr)```
 
-  - The port number and IP in ```AF_INET``` are expected to be in big endian (regardless of architecture) and there are functions that can be used to convert this such as ```htonl``` (Host to network long)
-  - 
+### Traffic Headers
+Traffic must movr in a uniform manner to ensure that it is properly handled over the internet which necessitates standards for routable traffic. Traffic at the lower layers by nature is unencrypted to facilitate transportation from one endpoint to another and because of so we can take a look at what these headers look like and what role they play in ensuring data is transported over the internet. Since each layer plays a distinct part, we'll split this up by layer. 
+
+#### Physical
+Hopefully you never haveto deal with anythinh this low on the totem pole, but layer 1 and 2 co-inside with one another and this field is often overlooked because its to small and nice, but at later 1 there are two important things in a frme.
+  - **Preamble** - The preamble is a 7 octes (56 bits) pattern of 1s and 0s that allows networked devices to syncronoze their recivever clocks allowing bit-level syncronization. 
+  - **Start Frame Delimiter** - An 8 bit value that marks the end of the preamble and th begninning of the layer 2 frame. 
+Since Physical layer Tranciever circuityu is required to connect the MAC to a physical medium (your NIC) a bus from the media independent interface family is required to define the structure of your function preamble. Different chips use different busses (F/E uses MII, but GbE uses GMII). 
+#### Data Link
+This are the traditional frames youre used to looking at if youre looking at LAN traffic. At the layer 2 level, the ethernet frame is a small header composed of a few minor parts to pass traffic to neighbors. 
+  - **Header** - The header is composed of the source and destination MAC addresses of the frame in question. Optionally this can contain a 802.1Q or 802.1ad (VLAN) tags.
+    - The EtherType field is normally used to display the size of the payload, but in a sitaiton in which the payload is over 1536, this field will be used to display the ptotocol encapsulated by the frame and in that case the length will be placed in the interpacket gap
+  - **Payload** - A variable length field which contains headers and data for higher layers
+  - **Frame Check Sequence** - a value computed as a function of the device MAC adresses, provides error checking. 
+
+![Ethernet](https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Ethernet_frame.svg/1920px-Ethernet_frame.svg.png) 
