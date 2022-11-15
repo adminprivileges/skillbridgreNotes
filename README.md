@@ -651,7 +651,7 @@ When your data is moved over the internet, layers 1-3 facilitate actually gettin
 Traffic must movr in a uniform manner to ensure that it is properly handled over the internet which necessitates standards for routable traffic. Traffic at the lower layers by nature is unencrypted to facilitate transportation from one endpoint to another and because of so we can take a look at what these headers look like and what role they play in ensuring data is transported over the internet. Since each layer plays a distinct part, we'll split this up by layer. 
 
 #### Physical
-Hopefully you never haveto deal with anythinh this low on the totem pole, but layer 1 and 2 co-inside with one another and this field is often overlooked because its to small and nice, but at later 1 there are two important things in a frme.
+Hopefully you never have to deal with anythinh this low on the totem pole, but layer 1 and 2 co-inside with one another and this field is often overlooked because its to small and nice, but at later 1 there are two important things in a frme.
   - **Preamble** - The preamble is a 7 octes (56 bits) pattern of 1s and 0s that allows networked devices to syncronoze their recivever clocks allowing bit-level syncronization. 
   - **Start Frame Delimiter** - An 8 bit value that marks the end of the preamble and th begninning of the layer 2 frame. 
 Since Physical layer Tranciever circuityu is required to connect the MAC to a physical medium (your NIC) a bus from the media independent interface family is required to define the structure of your function preamble. Different chips use different busses (F/E uses MII, but GbE uses GMII). 
@@ -663,3 +663,110 @@ This are the traditional frames youre used to looking at if youre looking at LAN
   - **Frame Check Sequence** - a value computed as a function of the device MAC adresses, provides error checking. 
 
 ![Ethernet](https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Ethernet_frame.svg/1920px-Ethernet_frame.svg.png) 
+
+#### Network
+At this layer, the data is placed into packets and these packets, of course have a multitude of fields centered around getting data from a source address to a destination address in another network. 
+
+```
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |Version|  IHL  |Type of Service|          Total Length         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Identification        |Flags|      Fragment Offset    |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |  Time to Live |    Protocol   |         Header Checksum       |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                       Source Address                          |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                    Destination Address                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                    Options                    |    Padding    |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+             Note that one tick mark represents one bit position.
+
+```
+*Source [RFC791](https://www.rfc-editor.org/rfc/rfc791)*
+
+While there are a lot of fields in this address I will point out ones of particular importance
+- **Source/Desttination Address** - On the internet, This field contains the first publicly routable IP address (usually your gateway) with that of the destination server or device in question
+- **TTL** - This displays the number of "Hops" or devices that this packet can traverse before it disappears (used to prevent infinitely lost packets from cluttering the internet) every time a packet hits a new device this number is decremented
+- **Flags** - mainly used to specify if a packet will be frangmented or not
+- **Fragment offset** - used to help put large packets that have been fragmented back together again
+
+#### Transport
+THe transport layer also has a multitude of fields, this time centered around ports and synchronization numbers. This layer is used to ensure reliable communication over the internet.
+```
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |          Source Port          |       Destination Port        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                        Sequence Number                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                    Acknowledgment Number                      |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |  Data |       |C|E|U|A|P|R|S|F|                               |
+   | Offset| Rsrvd |W|C|R|C|S|S|Y|I|            Window             |
+   |       |       |R|E|G|K|H|T|N|N|                               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |           Checksum            |         Urgent Pointer        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                           [Options]                           |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                                                               :
+   :                             Data                              :
+   :                                                               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+          Note that one tick mark represents one bit position.
+```
+*Source: [RFC9293](https://www.rfc-editor.org/rfc/rfc9293)*
+
+While there are many fields here, the most important are
+- **Sequence/Acknowledgement Numbers** - These numbers are used betweent he client and the server in a two way comunication to synchronize the flow of communication and ensure no packets are lost within a conversation. They will change throughgout the conversation as a result of the volume of traffic sent.
+- **Flags** - TCP has various flags to use as a form of flow control. Ther are as follows
+  - <details>
+
+    <table class="tg">
+    <thead>
+      <tr>
+        <th class="tg-uzvj">TCP flag</th>
+        <th class="tg-wa1i">Meaning</th>
+        <th class="tg-wa1i">Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="tg-cly1">URG</td>
+        <td class="tg-cly1">Urgent</td>
+        <td class="tg-cly1">Identifies important data</td>
+      </tr>
+      <tr>
+        <td class="tg-cly1">ACK</td>
+        <td class="tg-cly1">Acknowledgment</td>
+        <td class="tg-cly1">Acknowledges a packet; it is turned on for the majority of the connection</td>
+      </tr>
+      <tr>
+        <td class="tg-cly1">PSH</td>
+        <td class="tg-cly1">Push</td>
+        <td class="tg-cly1">Tells the receiver to push the data through instead of buffering it</td>
+      </tr>
+      <tr>
+        <td class="tg-cly1">RST</td>
+        <td class="tg-cly1">Reset</td>
+        <td class="tg-cly1">Resets a connection</td>
+      </tr>
+      <tr>
+        <td class="tg-cly1">SYN</td>
+        <td class="tg-cly1">Synchronize</td>
+        <td class="tg-cly1">Synchronizes sequence numbers at the beginning of a connection</td>
+      </tr>
+      <tr>
+        <td class="tg-cly1">FIN</td>
+        <td class="tg-cly1">Finish</td>
+        <td class="tg-cly1">Gracefully closes a connection when both sides say goodbye</td>
+      </tr>
+    </tbody>
+    </table>
+   </details>
