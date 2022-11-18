@@ -770,3 +770,162 @@ While there are many fields here, the most important are
     </tbody>
     </table>
    </details>
+
+### Network Sniffing
+#### Definitions/Concepts to know
+- In an unswitched network data is delivered to all devices regardless of intent, this is patched in switched networks
+  - Even in a switched network, you can sniff traffic not meant for you by going into promiscuous mode.
+- ```tcpdump``` - A command line utility used to sniff traffic
+- ```dsniff``` - sniffer specifically designed to look for user/pass
+- **Raw Sockets** - provides direct access to lower level protocols and data must be explicitly handled by the program.
+  - specified by ```SOCK_RAW```
+  - programs that handle raw sockets need root permissions.
+- ```Nemesis``` is a command line utility used to spoof network traffic
+  - Nemesis typically does single commands for requests, but it can be combined with some bash scripting to send bogus arp requests every 10s
+    ```
+      reader@hacking:~/booksrc $ while true
+      > do
+      > sudo nemesis arp -v -r -d eth0 -S 192.168.0.1 -D 192.168.0.118 -h
+      00:00:AD:D1:C7:ED -m 00:C0:F0:79:3D:30 -H 00:00:AD:D1:C7:ED -M 
+      00:C0:F0:79:3D:30
+      > sudo nemesis arp -v -r -d eth0 -S 192.168.0.118 -D 192.168.0.1 -h 
+      00:00:AD:D1:C7:ED -m 00:50:18:00:0F:01 -H 00:00:AD:D1:C7:ED -M 
+      00:50:18:00:0F:01
+      > echo "Redirecting..."
+      > sleep 10
+      > done
+      ```
+
+### Attacks
+#### Definitions/Concepts to know
+- **ARP Poisoning** is a man in the middle style attack that takes advantage of the fact that ARP requests, used to pair IP addresses with MACs, are stateless and machines accept replies without valid requests
+- **SYN FLood** exhausts the connection states of a device by attempting to open a bunch of TCP connections without sending any information
+  - This is prevented in linux via SYN cookies, which adjust initial ack numbers with info based on gost details, the connections dont become active unless the final ack is checked. This is done because ack packets require actual info to be sent.    
+- **Ping of Death** occurs because the max ICMP echo size was 65538 bytes and people would purposefully send packets larger than this to crash systems. 
+- **Teardrop** exploits a vulnerability in TCP fragmentation in which the numbers are supposed to reassemble packets with no overlap, if overlap occured it could cause programs to crash.
+- **Amplification attacks** take advantage of broadcast domains by pinging the broadcast address with the spoofed IP of the victim causing all devices in the domain to reply to the request to the victim. 
+- **TCP/IP Hijacking** - grabs the sequence and acknowledgement numbers from a legitimate connection (usually something that uses one time passwords) and spoofs its IP address along with the proper sequence and acknowledgement numbers for a man on the side style attack
+
+## x500
+### Shellcode
+#### Definitions/Concepts to know
+- Shellcode isnt C, but the underlying assembly instructions used to create system calls via interrupts and such, in a C program you can trace a program's system calls via the ```strace``` command
+  - Each linux system call should have a well documented ```man``` page
+  - Each linux system call also has an unique number that assembly uses to reference it. These system calld will be executed using system interrupts via the ```int``` assembly instruction.
+    - When int is called:
+      - ```EAX``` is the system call to make
+      - ```EBX, ECX, EDX``` hold the first second, and third arguments, these can be set with the ```mov``` instruction
+- ```nasm``` is used to assemble assembly code, ```ndisasm``` does the opposite
+  - with the ```-f elf``` flag it can create a standalone binary, although it will need to be linked with ```ld``` after
+- Shellcode is injected into a running process much like a virus infecting a cell.
+  - because of this, you cant declare memory as you would in a standalone executable. So shellcode must be able to execute regardless of current memory state, this is reffered to as position independent code.
+- Stack based ecploits take advantage of the ```call``` instruction's control of execution flow via the return address.
+  - If a function is called, your next instruction becomes the return address, if this is declaring your variable, this will be pushed to the stack in which it can be popped off and used without specifying an exact memory location.
+- GDB Can be attached to coredumps, but if you want a sizeable one, make sure to use ```ulimit -c unlimited``` to move the restrictions on size after which you can simply use ```gdb -q -c ./core```
+
+#### Fixing NULL bytes
+On 32bit architecture, shell code that contains NULL bytes will be stripped, which can cause some issues with the shell code. There are a few techniques you can use to avoid this.
+- For this section the following shellcode will be the example.
+  ```
+  BITS 32             ;  Tell nasm this is 32-bit code.
+
+    call mark_below   ;  Call below the string to instructions
+    db "Hello, world!",  0x0a, 0x0d  ; with newline and carriage return bytes.
+
+  mark_below:
+  ; ssize_t write(int fd,  const void *buf, size_t count);
+    pop ecx           ; Pop  the return address (string ptr) into ecx.
+    mov eax, 4        ; Write  syscall #.
+    mov ebx, 1        ; STDOUT  file descriptor
+    mov edx, 15       ; Length of the string
+    int 0x80          ; Do syscall: write(1, string, 14)
+
+  ; void _exit(int status);
+    mov eax, 1        ; Exit syscall #
+    mov ebx, 0        ; Status = 0
+    int 0x80          ; Do syscall:  exit(0)
+  ```
+- **Function Calls** - Function calls are used to jump large stretches of memory, but in a smaller piece of self contained code, this will cause issues as it occupies only a small portion of memory, which will lead to these small jumps being padded with nulls.
+  - To avoid this, we can use ```jmp``` instructions whhich can use shorts to jump to a location in memory, then we can use a call function to go to a previous section in memory which will result in the ```call``` function using a larger twos complement to represent a negative value. 
+    - <details><summary>Example</summary>
+
+        ```
+        BITS 32             ;  Tell nasm this is 32-bit code.
+
+        jmp short one       ;  Jump down to a call at the end.
+
+        two:
+        ; ssize_t write(int fd,  const void *buf, size_t count);
+          pop ecx           ;  Pop the return address (string ptr) into ecx.
+          mov eax, 4        ;  Write syscall #.
+          mov ebx, 1        ;  STDOUT file descriptor
+          mov edx, 15       ;  Length of the string
+          int 0x80          ;  Do syscall: write(1, string, 14)
+
+        ; void _exit(int status);
+          mov eax, 1        ; Exit syscall #
+          mov ebx, 0        ; Status = 0
+          int 0x80          ; Do syscall: exit(0)
+
+        one:
+          call two   ; Call back upwards to avoid null bytes
+          db "Hello, world!", 0x0a, 0x0d ; with newline and carriage return bytes.
+        ```
+      </details> 
+- **```MOV``` instructions**
+  - EAX, EBX, ECX, EDX, ESI, EDI, EBP, and ESP registers are 32 bits in width but they all have a 16 buit counterpart which simply removes the E (for extended). Within these 16 bit counterparts, the high 8 or the low 8 bits can be addresses individially int he case of ```AX``` using ```AH``` and ```AL``` respectively allowing for a n 8 bit instruction. 
+    <details>
+      <table>
+      <thead>
+        <tr>
+          <th>Machine code</th>
+          <th>Assembly</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>B8 04 00 00 00</td>
+          <td>mov eax,0x4</td>
+        </tr>
+        <tr>
+          <td>66 B8 04 00</td>
+          <td>mov ax,0x4</td>
+        </tr>
+        <tr>
+          <td>B0 04</td>
+          <td>mov al,0x4</td>
+        </tr>
+      </tbody>
+      </table>
+    </details>
+
+    - Using this method does have one big caveat. Since the upper 8 bits of the register can contain anything, it is best to zero out the register before using it. This is most easily done via executing an ```xor``` function on a register against itself resulting in all 0s. EX:   ```xor eax,eax```
+      - <details><summary>Example</summary>
+
+          ```
+          BITS 32             ;  Tell nasm this is 32-bit code.
+
+          jmp short one       ;  Jump down to a call at the end.
+
+          two:
+          ; ssize_t write(int fd,  const void *buf, size_t count);
+            pop ecx           ; Pop  the return address (string ptr) into ecx.
+            xor eax, eax      ; Zero  out full 32 bits of eax register.
+            mov al, 4         ; Write  syscall #4 to the low byte of eax.
+            xor ebx, ebx      ; Zero out ebx.
+            inc ebx           ; Increment ebx to 1,  STDOUT file descriptor.
+            xor edx, edx
+            mov dl, 15        ; Length of the string
+            int 0x80          ; Do syscall: write(1, string, 14)
+
+          ; void _exit(int status);
+            mov al, 1        ; Exit syscall #1, the top 3 bytes are still zeroed.
+            dec ebx          ; Decrement ebx back down to 0 for status = 0.
+            int 0x80         ; Do syscall: exit(0)
+
+          one:
+            call two   ; Call back upwards to avoid null bytes
+            db "Hello, world!", 0x0a, 0x0d  ; with newline and carriage return bytes.
+          ```
+          </details>
+
