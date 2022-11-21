@@ -340,7 +340,7 @@ In C files are handled by 2 different ways file descriptors and file streams. Fi
   - ![pic](https://www.mkdynamics.net/current_projects/computer_security/images/Basic_Linux_exploits/buffer_overflow_image.jpeg) 
   - When overflowing a buffer, there are two ways you can find the offset from the variable you control to the return address. You can 
     - Use an ever growing input repeating your return address until youre sucessful (Easier with command line argument stuff).
-    - Use ```msf-pattern-create``` to make a unique byte array to overflow your return address and then ```msf-pattern_offset``` to find the specific size (Easier if your debugging info is more robust)
+    - Use ```msf-pattern_create``` to make a unique byte array to overflow your return address and then ```msf-pattern_offset``` to find the specific size (Easier if your debugging info is more robust)
       - <details>
   
         ```bash
