@@ -7,4 +7,6 @@
 
 - got confused for a sec in x330 since they changed the compiled name from the default exploit_notesearch to just notesearch so i was looking for the address of my variables in notesearch which is running as root who doesnt have variables
 
-- The VM prolly shouldnt be able to touch the internet
+- Is there a way for me to set gdb to follow the execution of a program into an imported library like ```gets()```
+
+- Is there a way to script user input in bash that doesnt involve importing ```expect()``` (i would like to have a environment independent way of doing it)

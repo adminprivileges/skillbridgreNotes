@@ -120,15 +120,17 @@ A useful command line tool for debugging code.
     > quit
     > echo "set dis intel" > ~/.gdbinit
     ```
-- In order to see more verbose debugging infomration include the ```-g``` flag when compiling with ```gcc```, this will give GDB access to the source code, vars, etc. 
+- In order to see more verbose debugging infomration include the ```-g``` flag when compiling with ```gcc```, this will give GDB access to the source code, vars, etc.
+- When debugging any program that forks execution to a child process, gdb can instucted to follow the execution with ```set follow-fork-mode child``` (this is from withi gdb, not from invocation with bash)
 ### Commands
-  - ```nexti``` - Next Assembly Instruction
+  - ```nexti``` or ```ni``` - Next Assembly Instruction
   - ```r [opt_argument]``` or ```run [opt_argument]``` - Start or restart the program
   - ```c``` or ```continue``` - Continue to the next breakpoint
   - ```b```  or ```break``` - Set breakpoint
     - ```info b``` - inspect breakpoints
     -  ```disable/enable b [breakSSpoint_number]``` - disable/enable a set breakpoint
     - ```delete [breakpoint_number]``` - delete breakpoint
+    - *Note: When setting a breakpoint to an assembly instruction, make sure to use \* to instruct gdb to stop at e memory location ex: ```break *main+69``` or ```break *0x102982```*
    -  ```p [variable]``` or ```print [variable]``` - print a variable or register
    - ```set [variable]``` - set the value of a variable inline  
    - ```bt```- backtraces the stack from the current point in execution
