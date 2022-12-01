@@ -10,3 +10,6 @@
 - Is there a way for me to set gdb to follow the execution of a program into an imported library like ```gets()```
 
 - Is there a way to script user input in bash that doesnt involve importing ```expect()``` (i would like to have a environment independent way of doing it)
+
+- the book method of attaching to a running process wasnt working ```sudo gdb -q—pid=25830 --symbols=./a.out``` so i used ```sudo gdb attach 27635 --symbols=./a.out```
+- 
